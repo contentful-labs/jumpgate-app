@@ -1,4 +1,5 @@
-import { ContentType } from 'contentful-ui-extensions-sdk';
+import { Entry } from 'contentful';
+import { AppExtensionSDK, ContentType } from 'contentful-ui-extensions-sdk';
 import React, { useMemo } from 'react';
 
 import {
@@ -12,22 +13,28 @@ import {
 } from '@contentful/forma-36-react-components';
 
 import { SOURCE_CONTENT_TYPE_ID } from '../../../../constants';
-import { AppInstallationParameters } from '../../../../types';
+import {
+  AppInstallationParameters,
+  DesignSystemPatternFields,
+} from '../../../../types';
+import getEntryFieldValue from '../../../../utils/getEntryFieldValue';
 import styles from './DesignSystemPatternMatcher.module.css';
 
 interface DesignSystemPatternMatcherProps {
+  sdk: AppExtensionSDK;
   appInstallationParameters: AppInstallationParameters;
   setAppInstallationParameters: React.Dispatch<
     React.SetStateAction<AppInstallationParameters | null>
   >;
   contentTypes: ContentType[] | null;
-  sourceDesignSystemPatterns: Object[] | null;
+  sourceDesignSystemPatterns: Entry<DesignSystemPatternFields>[] | null;
 }
 
 const DesignSystemPatternMatcher: React.FC<DesignSystemPatternMatcherProps> = (
   props,
 ) => {
   const {
+    sdk,
     appInstallationParameters,
     setAppInstallationParameters,
     contentTypes,
@@ -85,10 +92,13 @@ const DesignSystemPatternMatcher: React.FC<DesignSystemPatternMatcherProps> = (
               <Option value="">N/A - No assignment</Option>
               {sourceDesignSystemPatterns.map((designSystemPattern) => (
                 <Option
-                  key={(designSystemPattern as any).sys.id}
-                  value={(designSystemPattern as any).sys.id}
+                  key={designSystemPattern.sys.id}
+                  value={designSystemPattern.sys.id}
                 >
-                  {(designSystemPattern as any).fields.title}
+                  {getEntryFieldValue(
+                    designSystemPattern.fields.title,
+                    designSystemPattern.sys.locale || sdk.locales.default,
+                  )}
                 </Option>
               ))}
             </SelectField>

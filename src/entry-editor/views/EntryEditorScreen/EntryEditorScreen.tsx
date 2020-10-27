@@ -18,6 +18,7 @@ import {
   AppInstallationParameters,
   DesignSystemPatternFields,
 } from '../../../types';
+import getEntryFieldValue from '../../../utils/getEntryFieldValue';
 import styles from './EntryEditorScreen.module.css';
 
 interface ConfigProps {
@@ -52,12 +53,22 @@ const EntryEditor: React.FC<ConfigProps> = (props) => {
           ),
         );
       } else if (installationParameters.spaceType === 'sourceandconsumer') {
-        setDesignSystemPattern(
-          await getSourceDesignSystemPattern(
-            sdk,
-            installationParameters.patternMatches[sdk.contentType.sys.id],
-          ),
+        const internalSystemPattern = await getSourceDesignSystemPattern(
+          sdk,
+          installationParameters.patternMatches[sdk.contentType.sys.id],
         );
+
+        if (internalSystemPattern !== null) {
+          // We need to resolve assets by ourself
+          internalSystemPattern.fields.previewImage = await sdk.space.getAsset(
+            getEntryFieldValue(
+              internalSystemPattern.fields.previewImage,
+              internalSystemPattern.sys.locale || sdk.locales.default,
+            ).sys.id,
+          );
+        }
+
+        setDesignSystemPattern(internalSystemPattern);
       }
     })();
   }, [
@@ -88,11 +99,24 @@ const EntryEditor: React.FC<ConfigProps> = (props) => {
       ) : (
         <>
           <Typography>
-            <Heading>{designSystemPattern.fields.title}</Heading>
+            <Heading>
+              {getEntryFieldValue(
+                designSystemPattern.fields.title,
+                designSystemPattern.sys.locale || sdk.locales.default,
+              )}
+            </Heading>
           </Typography>
           <img
             className={styles.previewImage}
-            src={designSystemPattern.fields.previewImage.fields.file.url}
+            src={
+              getEntryFieldValue(
+                getEntryFieldValue(
+                  designSystemPattern.fields.previewImage,
+                  designSystemPattern.sys.locale || sdk.locales.default,
+                ).fields.file,
+                designSystemPattern.sys.locale || sdk.locales.default,
+              ).url
+            }
             alt="Design Systsem Pattern preview"
           />
         </>

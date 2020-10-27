@@ -1,6 +1,6 @@
 import { useMount } from 'ahooks';
 import catchify from 'catchify';
-import { createClient } from 'contentful';
+import { createClient, Entry } from 'contentful';
 import { AppExtensionSDK, ContentType } from 'contentful-ui-extensions-sdk';
 import React, { useEffect, useState, useMemo, useCallback } from 'react';
 
@@ -19,7 +19,10 @@ import {
   SOURCE_CONTENT_TYPE_ID,
   SOURCE_CONTENT_TYPE_NAME,
 } from '../../../constants';
-import { AppInstallationParameters } from '../../../types';
+import {
+  AppInstallationParameters,
+  DesignSystemPatternFields,
+} from '../../../types';
 import createDesignSystemPatternContentType from '../../createDesignSystemPatternContentType';
 import {
   getSourceDesignSystemPatterns,
@@ -71,7 +74,7 @@ const Config: React.FC<ConfigProps> = (props) => {
 
   // Source space design system patterns (could be from this space, or another)
   const [sourceDesignSystemPatterns, setSourceDesignSystemPatterns] = useState<
-    Object[] | null
+    Entry<DesignSystemPatternFields>[] | null
   >(null);
 
   // Installation parameters
@@ -391,6 +394,7 @@ const Config: React.FC<ConfigProps> = (props) => {
         appInstallationParameters.spaceType || '',
       ) ? (
         <DesignSystemPatternMatcher
+          sdk={sdk}
           appInstallationParameters={appInstallationParameters}
           setAppInstallationParameters={setAppInstallationParameters}
           contentTypes={contentTypes}
