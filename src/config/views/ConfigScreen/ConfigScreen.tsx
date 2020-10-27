@@ -105,6 +105,10 @@ const Config: React.FC<ConfigProps> = (props) => {
 
       setAppInstallationParameters(parameters);
 
+      if (parameters.spaceType === 'sourceandconsumer') {
+        getSourceDesignSystemPatterns(sdk).then(setSourceDesignSystemPatterns);
+      }
+
       sdk.app.setReady();
     })();
   });
