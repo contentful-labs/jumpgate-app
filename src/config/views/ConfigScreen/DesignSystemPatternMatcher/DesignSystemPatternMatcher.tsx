@@ -51,6 +51,28 @@ const DesignSystemPatternMatcher: React.FC<DesignSystemPatternMatcherProps> = (
     );
   }, [contentTypes]);
 
+  const fallbackToNameMatchWhenNoValue = (contentType: ContentType): string => {
+    if (
+      typeof appInstallationParameters.patternMatches[contentType.sys.id] !==
+      'undefined'
+    ) {
+      return appInstallationParameters.patternMatches[contentType.sys.id];
+    }
+
+    return (
+      sourceDesignSystemPatterns?.find((designSystemPattern) => {
+        const title = getEntryFieldValue(
+          designSystemPattern.fields.title,
+          designSystemPattern.sys.locale || sdk.locales.default,
+        ) as string;
+
+        return (
+          title.startsWith(contentType.name) || title.endsWith(contentType.name)
+        );
+      })?.sys.id || ''
+    );
+  };
+
   if (
     appInstallationParameters.spaceType === 'consumer' &&
     appInstallationParameters.sourceConnectionValidated === false
@@ -75,10 +97,7 @@ const DesignSystemPatternMatcher: React.FC<DesignSystemPatternMatcherProps> = (
               name="optionSelect"
               id="optionSelect"
               labelText={contentType.name}
-              value={
-                appInstallationParameters.patternMatches[contentType.sys.id] ||
-                ''
-              }
+              value={fallbackToNameMatchWhenNoValue(contentType)}
               onChange={(e: React.ChangeEvent<HTMLSelectElement>) => {
                 setAppInstallationParameters({
                   ...appInstallationParameters,
