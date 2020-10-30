@@ -171,7 +171,7 @@ const Config: React.FC<ConfigProps> = (props) => {
     return true;
   }, [appInstallationParameters, sdk.notifier]);
 
-  // Fetch external source space content types when space is verified
+  // Fetch external source space design patterns when space is verified
   useEffect(() => {
     (async () => {
       if (
