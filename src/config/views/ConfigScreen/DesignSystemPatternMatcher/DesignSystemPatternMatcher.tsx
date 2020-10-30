@@ -1,6 +1,6 @@
 import { Entry } from 'contentful';
 import { AppExtensionSDK, ContentType } from 'contentful-ui-extensions-sdk';
-import React, { useMemo } from 'react';
+import React, { useEffect, useMemo } from 'react';
 
 import {
   SkeletonContainer,
@@ -10,6 +10,7 @@ import {
   Option,
   Typography,
   Form,
+  EmptyState,
 } from '@contentful/forma-36-react-components';
 
 import { SOURCE_CONTENT_TYPE_ID } from '../../../../constants';
@@ -61,17 +62,74 @@ const DesignSystemPatternMatcher: React.FC<DesignSystemPatternMatcherProps> = (
 
     return (
       sourceDesignSystemPatterns?.find((designSystemPattern) => {
-        const title = getEntryFieldValue(
-          designSystemPattern.fields.title,
+        const name = getEntryFieldValue(
+          designSystemPattern.fields.name,
           designSystemPattern.sys.locale || sdk.locales.default,
         ) as string;
 
         return (
-          title.startsWith(contentType.name) || title.endsWith(contentType.name)
+          name.startsWith(contentType.name) || name.endsWith(contentType.name)
         );
       })?.sys.id || ''
     );
   };
+
+  // Populate defaults
+  useEffect(() => {
+    if (
+      sourceDesignSystemPatterns === null ||
+      sourceDesignSystemPatterns.length === null ||
+      filteredContentTypes.length === 0
+    ) {
+      return;
+    }
+
+    const newPatternMatches: Record<string, string> = {};
+
+    filteredContentTypes.forEach((contentType) => {
+      if (
+        typeof appInstallationParameters.patternMatches[contentType.sys.id] !==
+        'undefined'
+      ) {
+        return;
+      }
+
+      const nameMatchingDesignSystemPattern = sourceDesignSystemPatterns?.find(
+        (designSystemPattern) => {
+          const name = getEntryFieldValue(
+            designSystemPattern.fields.name,
+            designSystemPattern.sys.locale || sdk.locales.default,
+          ) as string;
+
+          return (
+            name.startsWith(contentType.name) || name.endsWith(contentType.name)
+          );
+        },
+      )?.sys.id;
+
+      if (nameMatchingDesignSystemPattern === undefined) {
+        return;
+      }
+
+      newPatternMatches[contentType.sys.id] = nameMatchingDesignSystemPattern;
+    });
+
+    if (Object.keys(newPatternMatches).length > 0) {
+      setAppInstallationParameters({
+        ...appInstallationParameters,
+        patternMatches: {
+          ...appInstallationParameters.patternMatches,
+          ...newPatternMatches,
+        },
+      });
+    }
+  }, [
+    appInstallationParameters,
+    filteredContentTypes,
+    sdk.locales.default,
+    setAppInstallationParameters,
+    sourceDesignSystemPatterns,
+  ]);
 
   if (
     appInstallationParameters.spaceType === 'consumer' &&
@@ -84,6 +142,16 @@ const DesignSystemPatternMatcher: React.FC<DesignSystemPatternMatcherProps> = (
     <SkeletonContainer>
       <SkeletonBodyText numberOfLines={4} />
     </SkeletonContainer>
+  ) : sourceDesignSystemPatterns.length === 0 ? (
+    <div className={styles.container}>
+      <EmptyState
+        headingProps={{ text: 'No Design System Patterns (yet!)' }}
+        descriptionProps={{
+          text:
+            "It looks like your Design System Source space has no published patterns. Don't worry, as soon as some get published, you can come back here and assign them to your content types.",
+        }}
+      />
+    </div>
   ) : (
     <div className={styles.container}>
       <Typography>
@@ -108,6 +176,7 @@ const DesignSystemPatternMatcher: React.FC<DesignSystemPatternMatcherProps> = (
                 });
               }}
             >
+              {/* SOLVE onChange not firing for default values */}
               <Option value="">N/A - No assignment</Option>
               {sourceDesignSystemPatterns.map((designSystemPattern) => (
                 <Option
@@ -115,7 +184,7 @@ const DesignSystemPatternMatcher: React.FC<DesignSystemPatternMatcherProps> = (
                   value={designSystemPattern.sys.id}
                 >
                   {getEntryFieldValue(
-                    designSystemPattern.fields.title,
+                    designSystemPattern.fields.name,
                     designSystemPattern.sys.locale || sdk.locales.default,
                   )}
                 </Option>

@@ -11,20 +11,55 @@ const contentType = {
     id: SOURCE_CONTENT_TYPE_ID,
   },
   name: SOURCE_CONTENT_TYPE_NAME,
-  displayField: 'title',
+  displayField: 'name',
   fields: [
     {
-      id: 'title',
-      name: 'Title',
+      id: 'name',
+      name: 'Name',
       required: true,
       type: 'Symbol',
+      validations: [
+        {
+          size: { max: 80 },
+        },
+      ],
     },
     {
-      id: 'previewImage',
-      name: 'Preview Image',
+      id: 'description',
+      name: 'Description',
       required: false,
-      type: 'Link',
-      linkType: 'Asset',
+      type: 'Symbol',
+      validations: [
+        {
+          size: { max: 160 },
+        },
+      ],
+    },
+    {
+      id: 'contentGuidelines',
+      name: 'Content guidelines',
+      required: false,
+      type: 'RichText',
+      validations: [
+        { nodes: { 'embedded-asset-block': [{ size: { min: 0, max: 2 } }] } },
+        {
+          enabledNodeTypes: [
+            'heading-1',
+            'heading-2',
+            'heading-3',
+            'heading-4',
+            'heading-5',
+            'heading-6',
+            'ordered-list',
+            'unordered-list',
+            'hr',
+            'blockquote',
+            'embedded-asset-block',
+          ],
+          message:
+            'Only heading 1, heading 2, heading 3, heading 4, heading 5, heading 6, ordered list, unordered list, horizontal rule, quote, and asset nodes are allowed',
+        },
+      ],
     },
   ],
 };

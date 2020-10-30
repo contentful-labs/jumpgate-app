@@ -1,6 +1,6 @@
-import { Entry } from 'contentful';
+import { Entry, Asset } from 'contentful';
 import { EditorExtensionSDK } from 'contentful-ui-extensions-sdk';
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo, useCallback } from 'react';
 
 import {
   SkeletonContainer,
@@ -8,10 +8,18 @@ import {
   Heading,
   Typography,
   EmptyState,
+  Paragraph,
+  Subheading,
 } from '@contentful/forma-36-react-components';
+import {
+  documentToReactComponents,
+  Options,
+} from '@contentful/rich-text-react-renderer';
+import { BLOCKS } from '@contentful/rich-text-types';
 
 import {
   getExternalSourceDesignSystemPattern,
+  getSourceAsset,
   getSourceDesignSystemPattern,
 } from '../../../config/getSourceDesignSystemPatterns';
 import {
@@ -58,16 +66,6 @@ const EntryEditor: React.FC<ConfigProps> = (props) => {
           installationParameters.patternMatches[sdk.contentType.sys.id],
         );
 
-        if (internalSystemPattern !== null) {
-          // We need to resolve assets by ourself
-          internalSystemPattern.fields.previewImage = await sdk.space.getAsset(
-            getEntryFieldValue(
-              internalSystemPattern.fields.previewImage,
-              internalSystemPattern.sys.locale || sdk.locales.default,
-            ).sys.id,
-          );
-        }
-
         setDesignSystemPattern(internalSystemPattern);
       }
     })();
@@ -79,6 +77,85 @@ const EntryEditor: React.FC<ConfigProps> = (props) => {
     sdk,
     sdk.contentType.sys.id,
   ]);
+
+  const [assets, setAssets] = useState<
+    Record<string, Asset | null | undefined>
+  >({});
+
+  const loadAsset = useCallback(
+    async (assetId: string): Promise<void> => {
+      setAssets({
+        ...assets,
+        [assetId]: null,
+      });
+
+      const loadedAsset = await getSourceAsset(sdk, assetId);
+
+      if (loadedAsset === null) {
+        return;
+      }
+
+      setAssets({
+        ...assets,
+        [assetId]: loadedAsset,
+      });
+    },
+    [assets, sdk],
+  );
+
+  const richTextOptions = useMemo(() => {
+    const options: Options = {
+      renderNode: {
+        [BLOCKS.HEADING_1]: (_node, children) => {
+          return <Heading>{children}</Heading>;
+        },
+        [BLOCKS.HEADING_2]: (_node, children) => {
+          return <Subheading>{children}</Subheading>;
+        },
+        [BLOCKS.HEADING_3]: (_node, children) => {
+          return <Subheading element="h3">{children}</Subheading>;
+        },
+        [BLOCKS.HEADING_4]: (_node, children) => {
+          return <Subheading element="h4">{children}</Subheading>;
+        },
+        [BLOCKS.PARAGRAPH]: (_node, children) => {
+          return <Paragraph>{children}</Paragraph>;
+        },
+        [BLOCKS.EMBEDDED_ASSET]: (node) => {
+          const assetId = node.data.target.sys.id;
+          const asset = assets[assetId];
+
+          if (asset === undefined) {
+            loadAsset(assetId);
+            return null;
+          }
+
+          if (asset === null) {
+            return null;
+          }
+
+          const file = getEntryFieldValue(
+            asset.fields.file,
+            asset.sys.locale || sdk.locales.default,
+          );
+
+          return (
+            <img
+              src={file.url}
+              alt={getEntryFieldValue(
+                asset.fields.title,
+                asset.sys.locale || sdk.locales.default,
+              )}
+              width={file.details.image.width}
+              height={file.details.image.height}
+            />
+          );
+        },
+      },
+    };
+
+    return options;
+  }, [assets, loadAsset, sdk.locales.default]);
 
   return (
     <div className={styles.container}>
@@ -99,26 +176,32 @@ const EntryEditor: React.FC<ConfigProps> = (props) => {
       ) : (
         <>
           <Typography>
+            <Paragraph>
+              Last updated on:{' '}
+              {new Date(designSystemPattern.sys.updatedAt).toLocaleDateString()}
+            </Paragraph>
             <Heading>
               {getEntryFieldValue(
-                designSystemPattern.fields.title,
+                designSystemPattern.fields.name,
                 designSystemPattern.sys.locale || sdk.locales.default,
               )}
             </Heading>
-          </Typography>
-          <img
-            className={styles.previewImage}
-            src={
-              getEntryFieldValue(
-                getEntryFieldValue(
-                  designSystemPattern.fields.previewImage,
-                  designSystemPattern.sys.locale || sdk.locales.default,
-                ).fields.file,
+            <Paragraph>
+              {getEntryFieldValue(
+                designSystemPattern.fields.description,
                 designSystemPattern.sys.locale || sdk.locales.default,
-              ).url
-            }
-            alt="Design Systsem Pattern preview"
-          />
+              )}
+            </Paragraph>
+            <div className={styles.richText}>
+              {documentToReactComponents(
+                getEntryFieldValue(
+                  designSystemPattern.fields.contentGuidelines,
+                  designSystemPattern.sys.locale || sdk.locales.default,
+                ),
+                richTextOptions,
+              )}
+            </div>
+          </Typography>
         </>
       )}
     </div>

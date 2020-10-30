@@ -1,4 +1,4 @@
-import { Asset } from 'contentful';
+import { RichTextContent } from 'contentful';
 
 export interface AppInstallationParameters {
   spaceType: 'source' | 'consumer' | 'sourceandconsumer' | null;
@@ -9,6 +9,7 @@ export interface AppInstallationParameters {
 }
 
 export interface DesignSystemPatternFields {
-  title: string;
-  previewImage: Asset;
+  name: string;
+  description: string;
+  contentGuidelines: RichTextContent;
 }

@@ -10,3 +10,19 @@
   display: block;
   max-width: 100%;
 }
+
+.richText {
+  font-family: var(--font-stack-primary);
+}
+
+.richText img {
+  display: block;
+  height: auto;
+  max-width: 100%;
+  margin-bottom: var(--spacing-l);
+  margin-top: var(--spacing-l);
+}
+
+.richText ul li > p {
+  margin-bottom: var(--spacing-xs);
+}

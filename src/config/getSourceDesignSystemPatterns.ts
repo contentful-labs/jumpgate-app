@@ -1,5 +1,5 @@
 import catchify from 'catchify';
-import { createClient, Entry } from 'contentful';
+import { Asset, createClient, Entry } from 'contentful';
 import {
   AppExtensionSDK,
   EditorExtensionSDK,
@@ -11,13 +11,19 @@ import { DesignSystemPatternFields } from '../types';
 export const getSourceDesignSystemPatterns = async (
   sdk: AppExtensionSDK,
 ): Promise<Entry<DesignSystemPatternFields>[]> => {
-  const { items: designSystemPatterns } = await sdk.space.getEntries<
-    Entry<DesignSystemPatternFields>
-  >({
-    limit: 1000,
-    content_type: SOURCE_CONTENT_TYPE_ID,
-    order: 'fields.title',
-  });
+  const [getEntriesError, getEntriesResponse] = await catchify(
+    sdk.space.getEntries<Entry<DesignSystemPatternFields>>({
+      limit: 1000,
+      content_type: SOURCE_CONTENT_TYPE_ID,
+      order: 'fields.name',
+    }),
+  );
+
+  if (getEntriesError !== null) {
+    return [];
+  }
+
+  const { items: designSystemPatterns } = getEntriesResponse;
 
   return designSystemPatterns || [];
 };
@@ -37,6 +43,21 @@ export const getSourceDesignSystemPattern = async (
   return entry;
 };
 
+export const getSourceAsset = async (
+  sdk: EditorExtensionSDK,
+  assetId: string,
+): Promise<Asset | null> => {
+  const [assetError, asset] = await catchify(
+    sdk.space.getAsset<Asset>(assetId),
+  );
+
+  if (assetError !== null) {
+    return null;
+  }
+
+  return asset;
+};
+
 export const getExternalSourceDesignSystemPatterns = async (
   spaceId: string,
   accessToken: string,
@@ -46,13 +67,19 @@ export const getExternalSourceDesignSystemPatterns = async (
     accessToken,
   });
 
-  const { items: designSystemPatterns } = await client.getEntries<
-    DesignSystemPatternFields
-  >({
-    limit: 1000,
-    content_type: SOURCE_CONTENT_TYPE_ID,
-    order: 'fields.title',
-  });
+  const [getEntriesError, getEntriesResponse] = await catchify(
+    client.getEntries<DesignSystemPatternFields>({
+      limit: 1000,
+      content_type: SOURCE_CONTENT_TYPE_ID,
+      order: 'fields.name',
+    }),
+  );
+
+  if (getEntriesError !== null) {
+    return [];
+  }
+
+  const { items: designSystemPatterns } = getEntriesResponse;
 
   return designSystemPatterns || [];
 };
