@@ -394,10 +394,9 @@ const Config: React.FC<ConfigProps> = (props) => {
         />
       ) : null}
 
-      {contentTypeExists === true &&
-      ['consumer', 'sourceandconsumer'].includes(
-        appInstallationParameters.spaceType || '',
-      ) ? (
+      {((appInstallationParameters.spaceType || '') === 'sourceandconsumer' &&
+        contentTypeExists === true) ||
+      appInstallationParameters.spaceType === 'consumer' ? (
         <DesignSystemPatternMatcher
           sdk={sdk}
           appInstallationParameters={appInstallationParameters}
