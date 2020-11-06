@@ -18,9 +18,10 @@ import {
 import { BLOCKS } from '@contentful/rich-text-types';
 
 import {
-  getExternalSourceDesignSystemPattern,
   getSourceAsset,
   getSourceDesignSystemPattern,
+  getExternalSourceDesignSystemPattern,
+  getExternalSourceAsset,
 } from '../../../config/getSourceDesignSystemPatterns';
 import {
   AppInstallationParameters,
@@ -89,7 +90,17 @@ const EntryEditor: React.FC<ConfigProps> = (props) => {
         [assetId]: null,
       });
 
-      const loadedAsset = await getSourceAsset(sdk, assetId);
+      let loadedAsset = null;
+
+      if (installationParameters.spaceType === 'consumer') {
+        loadedAsset = await getExternalSourceAsset(
+          installationParameters.sourceSpaceId!,
+          installationParameters.sourceDeliveryToken!,
+          assetId,
+        );
+      } else if (installationParameters.spaceType === 'sourceandconsumer') {
+        loadedAsset = await getSourceAsset(sdk, assetId);
+      }
 
       if (loadedAsset === null) {
         return;
@@ -100,7 +111,13 @@ const EntryEditor: React.FC<ConfigProps> = (props) => {
         [assetId]: loadedAsset,
       });
     },
-    [assets, sdk],
+    [
+      assets,
+      installationParameters.sourceDeliveryToken,
+      installationParameters.sourceSpaceId,
+      installationParameters.spaceType,
+      sdk,
+    ],
   );
 
   const richTextOptions = useMemo(() => {

@@ -104,3 +104,22 @@ export const getExternalSourceDesignSystemPattern = async (
 
   return entry;
 };
+
+export const getExternalSourceAsset = async (
+  spaceId: string,
+  accessToken: string,
+  assetId: string,
+): Promise<Asset | null> => {
+  const client = createClient({
+    space: spaceId,
+    accessToken,
+  });
+
+  const [assetError, asset] = await catchify(client.getAsset(assetId));
+
+  if (assetError !== null) {
+    return null;
+  }
+
+  return asset;
+};
