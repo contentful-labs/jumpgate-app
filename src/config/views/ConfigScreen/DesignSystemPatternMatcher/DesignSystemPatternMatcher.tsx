@@ -5,12 +5,17 @@ import React, { useEffect, useMemo } from 'react';
 import {
   SkeletonContainer,
   SkeletonBodyText,
-  Subheading,
-  SelectField,
+  Select,
   Option,
   Typography,
   Form,
   EmptyState,
+  Paragraph,
+  Table,
+  TableHead,
+  TableRow,
+  TableBody,
+  TableCell,
 } from '@contentful/forma-36-react-components';
 
 import { SOURCE_CONTENT_TYPE_ID } from '../../../../constants';
@@ -143,57 +148,72 @@ const DesignSystemPatternMatcher: React.FC<DesignSystemPatternMatcherProps> = (
       <SkeletonBodyText numberOfLines={4} />
     </SkeletonContainer>
   ) : sourceDesignSystemPatterns.length === 0 ? (
-    <div className={styles.container}>
-      <EmptyState
-        headingProps={{ text: 'No Design System Patterns (yet!)' }}
-        descriptionProps={{
-          text:
-            "It looks like your Design System Source space has no published patterns. Don't worry, as soon as some get published, you can come back here and assign them to your content types.",
-        }}
-      />
-    </div>
+    <EmptyState
+      headingProps={{ text: 'No Design System Patterns (yet!)' }}
+      descriptionProps={{
+        text:
+          "It looks like your Design System Source space has no published patterns. Don't worry, as soon as some get published, you can come back here and assign them to your content types.",
+      }}
+    />
   ) : (
-    <div className={styles.container}>
-      <Typography>
-        <Subheading className={styles.heading}>
-          Assign design system patterns to space content types
-        </Subheading>
-        <Form>
-          {filteredContentTypes.map((contentType) => (
-            <SelectField
-              key={contentType.sys.id}
-              name="optionSelect"
-              id="optionSelect"
-              labelText={contentType.name}
-              value={fallbackToNameMatchWhenNoValue(contentType)}
-              onChange={(e: React.ChangeEvent<HTMLSelectElement>) => {
-                setAppInstallationParameters({
-                  ...appInstallationParameters,
-                  patternMatches: {
-                    ...appInstallationParameters.patternMatches,
-                    [contentType.sys.id]: e.target.value,
-                  },
-                });
-              }}
-            >
-              {/* SOLVE onChange not firing for default values */}
-              <Option value="">N/A - No assignment</Option>
-              {sourceDesignSystemPatterns.map((designSystemPattern) => (
-                <Option
-                  key={designSystemPattern.sys.id}
-                  value={designSystemPattern.sys.id}
-                >
-                  {getEntryFieldValue(
-                    designSystemPattern.fields.name,
-                    designSystemPattern.sys.locale || sdk.locales.default,
-                  )}
-                </Option>
-              ))}
-            </SelectField>
-          ))}
-        </Form>
-      </Typography>
-    </div>
+    <Typography>
+      <Paragraph>
+        Below is a list of Content Types found in this space. You can assign a
+        Design System pattern to each, and that pattern documentation will be
+        shown in the editor tab when editing an entry of that content type.
+      </Paragraph>
+      <Form>
+        <Table>
+          <TableHead isSticky>
+            <TableRow>
+              <TableCell>Content Type</TableCell>
+              <TableCell>Design System Pattern</TableCell>
+            </TableRow>
+          </TableHead>
+          <TableBody>
+            {filteredContentTypes.map((contentType) => (
+              <TableRow key={contentType.sys.id}>
+                <TableCell>
+                  <div className={styles.contentTypeLabel}>
+                    {contentType.name}
+                  </div>
+                </TableCell>
+                <TableCell>
+                  <Select
+                    name="optionSelect"
+                    id="optionSelect"
+                    value={fallbackToNameMatchWhenNoValue(contentType)}
+                    onChange={(e: React.ChangeEvent<HTMLSelectElement>) => {
+                      setAppInstallationParameters({
+                        ...appInstallationParameters,
+                        patternMatches: {
+                          ...appInstallationParameters.patternMatches,
+                          [contentType.sys.id]: e.target.value,
+                        },
+                      });
+                    }}
+                  >
+                    {/* SOLVE onChange not firing for default values */}
+                    <Option value="">N/A - No assignment</Option>
+                    {sourceDesignSystemPatterns.map((designSystemPattern) => (
+                      <Option
+                        key={designSystemPattern.sys.id}
+                        value={designSystemPattern.sys.id}
+                      >
+                        {getEntryFieldValue(
+                          designSystemPattern.fields.name,
+                          designSystemPattern.sys.locale || sdk.locales.default,
+                        )}
+                      </Option>
+                    ))}
+                  </Select>
+                </TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      </Form>
+    </Typography>
   );
 };
 
