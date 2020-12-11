@@ -49,19 +49,18 @@ const SpaceSelector: React.FC<SpaceSelectorProps> = (props) => {
         </Subheading>
         <Paragraph>
           You need to provide a Space ID and a matching Delivery API Token of a
-          space from which you are pulling design system patterns (make sure
-          this app is installed in that space as well and specified as a "Design
-          system source").
+          space where your Design System is defined. This app needs to be
+          installed in that space as well.
         </Paragraph>
       </Typography>
       <TextField
         labelText="Space ID"
-        helpText="ID of a space where you have installed this app as a Design System source"
         id="sourceSpaceId"
         name="sourceSpaceId"
         onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
           setAppInstallationParameters({
             ...appInstallationParameters,
+            sourceConnectionValidated: false,
             sourceSpaceId: e.target.value.trim(),
           });
         }}
@@ -74,12 +73,12 @@ const SpaceSelector: React.FC<SpaceSelectorProps> = (props) => {
       />
       <TextField
         labelText="Delivery API Token"
-        helpText="Content Delivery API access token used to authenticated with the source space"
         id="sourceDeliveryToken"
         name="sourceDeliveryToken"
         onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
           setAppInstallationParameters({
             ...appInstallationParameters,
+            sourceConnectionValidated: false,
             sourceDeliveryToken: e.target.value.trim(),
           });
         }}

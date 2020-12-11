@@ -4,10 +4,53 @@
   margin: 2rem auto 0;
   max-width: 768px;
   min-height: 65vh;
-  padding: 2rem 3rem;
+  padding: var(--spacing-l);
+}
+
+.tabWithIcon {
+  align-items: center;
+  display: flex;
+}
+
+.tabWithIcon svg {
+  margin-left: var(--spacing-xs);
+}
+
+.tabContainer {
+  padding-top: var(--spacing-l);
 }
 
 .section {
   border-top: 1px solid var(--color-element-light);
   padding-top: var(--spacing-l);
+}
+
+.spacePurposeTitle {
+  margin-top: var(--spacing-2xl);
+}
+
+.spacePurposeGrid {
+  display: grid;
+  grid-gap: var(--spacing-m);
+  grid-template-columns: 1fr 1fr;
+}
+
+.spacePurposeItem {
+  display: flex;
+}
+
+.spacePurposeIcon {
+  align-items: center;
+  border: 2px solid var(--color-element-mid);
+  display: flex;
+  flex-shrink: 0;
+  height: 18px;
+  justify-content: center;
+  margin-right: var(--spacing-s);
+  width: 18px;
+}
+
+.spacePurposeIconSelected {
+  background-color: var(--color-blue-lightest);
+  border-color: var(--color-blue-light);
 }

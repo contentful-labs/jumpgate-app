@@ -7,12 +7,16 @@ import React, { useEffect, useState, useMemo, useCallback } from 'react';
 import {
   Form,
   Paragraph,
-  RadioButtonField,
   Subheading,
   Typography,
   SkeletonContainer,
   SkeletonBodyText,
   Note,
+  Tabs,
+  Tab,
+  TabPanel,
+  Card,
+  Icon,
 } from '@contentful/forma-36-react-components';
 
 import {
@@ -46,6 +50,11 @@ const defaultParameters: AppInstallationParameters = {
 
 const Config: React.FC<ConfigProps> = (props) => {
   const { sdk } = props;
+
+  // Tabs navigation
+  const [activeTab, setActiveTab] = useState<
+    null | 'spaceType' | 'designSystemPatternMatching'
+  >(null);
 
   // Load and store content types for the current space
   const [contentTypes, setContentTypes] = useState<ContentType[] | null>(null);
@@ -106,7 +115,15 @@ const Config: React.FC<ConfigProps> = (props) => {
       setAppInstallationParameters(parameters);
 
       if (parameters.spaceType === 'sourceandconsumer') {
-        getSourceDesignSystemPatterns(sdk).then(setSourceDesignSystemPatterns);
+        await getSourceDesignSystemPatterns(sdk).then(
+          setSourceDesignSystemPatterns,
+        );
+      }
+
+      if (Object.keys(savedParameters).length > 0) {
+        setActiveTab('designSystemPatternMatching');
+      } else {
+        setActiveTab('spaceType');
       }
 
       sdk.app.setReady();
@@ -143,10 +160,25 @@ const Config: React.FC<ConfigProps> = (props) => {
       return false;
     }
 
-    const client = createClient({
-      space: appInstallationParameters.sourceSpaceId || '',
-      accessToken: appInstallationParameters.sourceDeliveryToken || '',
-    });
+    let client = null;
+
+    try {
+      client = createClient({
+        space: appInstallationParameters.sourceSpaceId || '',
+        accessToken: appInstallationParameters.sourceDeliveryToken || '',
+      });
+    } catch (e) {
+      console.error(e);
+
+      sdk.notifier.error(
+        'Could not validate the source space connection. Double check that you have provided the correct Space ID and Delivery API Token.',
+      );
+      return false;
+    }
+
+    if (client === null) {
+      return false;
+    }
 
     const [spaceCheckError] = await catchify(client.getSpace());
 
@@ -306,104 +338,238 @@ const Config: React.FC<ConfigProps> = (props) => {
     validateSourceSpaceConnection,
   ]);
 
+  const currentSpaceIsSource = useMemo(() => {
+    if (
+      appInstallationParameters === null ||
+      appInstallationParameters.spaceType === null
+    ) {
+      return false;
+    }
+
+    return ['source', 'sourceandconsumer'].includes(
+      appInstallationParameters.spaceType,
+    );
+  }, [appInstallationParameters]);
+
+  const currentSpaceIsConsumer = useMemo(() => {
+    if (
+      appInstallationParameters === null ||
+      appInstallationParameters.spaceType === null
+    ) {
+      return false;
+    }
+
+    return ['consumer', 'sourceandconsumer'].includes(
+      appInstallationParameters.spaceType,
+    );
+  }, [appInstallationParameters]);
+
+  const initialSetupDone = useMemo(() => {
+    if (
+      appInstallationParameters === null ||
+      appInstallationParameters.spaceType === null
+    ) {
+      return false;
+    }
+
+    if (appInstallationParameters.spaceType === 'consumer') {
+      if (
+        !appInstallationParameters.sourceSpaceId ||
+        !appInstallationParameters.sourceDeliveryToken
+      ) {
+        return false;
+      }
+
+      if (!appInstallationParameters.sourceConnectionValidated) {
+        return false;
+      }
+    } else if (contentTypeExists === false) {
+      return false;
+    }
+
+    return true;
+  }, [appInstallationParameters, contentTypeExists]);
+
   if (appInstallationParameters === null) {
     return null;
   }
 
   return (
     <div className={styles.container}>
-      <Form>
-        <Typography>
-          <Subheading>Space type</Subheading>
-          <Paragraph>
-            Is this your design system <strong>source</strong> space, or will
-            you be pulling in a design system <strong>to</strong> this space?
-          </Paragraph>
-        </Typography>
-        <RadioButtonField
-          labelText="Design system source"
-          helpText="Design System will be defined in this space"
-          name="spaceType"
-          checked={appInstallationParameters.spaceType === 'source'}
-          value="source"
-          id="spaceTypeCheckbox1"
-          onChange={() => {
-            onSpaceTypeChange('source');
+      <Tabs>
+        <Tab
+          id="spaceType"
+          selected={activeTab === 'spaceType'}
+          onSelect={() => {
+            setActiveTab('spaceType');
           }}
-        />
-        <RadioButtonField
-          labelText="Design system consumer"
-          helpText="This space will pull a design system from another space"
-          name="spaceType"
-          checked={appInstallationParameters.spaceType === 'consumer'}
-          value="consumer"
-          id="spaceTypeCheckbox2"
-          onChange={() => {
-            onSpaceTypeChange('consumer');
-          }}
-        />
-        <RadioButtonField
-          labelText="Both a source and a consumer"
-          helpText="Choose this option if you will be both defining and consuming a design system in this space"
-          name="spaceType"
-          checked={appInstallationParameters.spaceType === 'sourceandconsumer'}
-          value="sourceandconsumer"
-          id="spaceTypeCheckbox3"
-          onChange={() => {
-            onSpaceTypeChange('sourceandconsumer');
-          }}
-        />
-      </Form>
+          className={styles.tabWithIcon}
+        >
+          Initial Setup{' '}
+          {initialSetupDone ? (
+            <Icon color="positive" icon="CheckCircle" />
+          ) : null}{' '}
+        </Tab>
+        {appInstallationParameters.spaceType === 'consumer' ||
+        appInstallationParameters.spaceType === 'sourceandconsumer' ? (
+          <Tab
+            id="spaceType"
+            selected={activeTab === 'designSystemPatternMatching'}
+            onSelect={() => {
+              setActiveTab('designSystemPatternMatching');
+            }}
+            disabled={
+              (appInstallationParameters.spaceType === 'sourceandconsumer' &&
+                contentTypeExists === false) ||
+              (appInstallationParameters.spaceType === 'consumer' &&
+                appInstallationParameters.sourceConnectionValidated === false)
+            }
+          >
+            Design System Pattern Matching
+          </Tab>
+        ) : null}
+      </Tabs>
 
-      {appInstallationParameters.spaceType?.includes('source') ? (
-        <div className={styles.section}>
-          {contentTypes === null ? (
-            <SkeletonContainer>
-              <SkeletonBodyText numberOfLines={2} />
-            </SkeletonContainer>
-          ) : (
-            <div>
-              <Typography>
-                <Subheading>Design System Source - content type</Subheading>
-                <Paragraph>
-                  The app will generate a content type in this space that will
-                  serve as your Design System patterns source.
-                </Paragraph>
-              </Typography>
-              {contentTypeExists === true ? (
-                <Note noteType="positive">
-                  Design System Pattern content type is present in this space.
-                </Note>
+      {activeTab === 'spaceType' ? (
+        <TabPanel id="spaceType" className={styles.tabContainer}>
+          <Form>
+            <Typography>
+              <Paragraph>
+                The <strong>Design System</strong> app does two things. You can
+                define design system patterns, and you can assign patterns to
+                content types in order to help editors understand them better.
+                You can do these things in separate spaces (we recommend having
+                a dedicated "Design System" space for better governance), or you
+                can do both in the same space.
+              </Paragraph>
+              <Subheading className={styles.spacePurposeTitle}>
+                What is the purpose of the app for this space?
+              </Subheading>
+            </Typography>
+
+            <div className={styles.spacePurposeGrid}>
+              <Card
+                selected={currentSpaceIsSource}
+                onClick={() => {
+                  currentSpaceIsSource
+                    ? appInstallationParameters.spaceType ===
+                      'sourceandconsumer'
+                      ? onSpaceTypeChange('consumer')
+                      : onSpaceTypeChange(null)
+                    : appInstallationParameters.spaceType === 'consumer'
+                    ? onSpaceTypeChange('sourceandconsumer')
+                    : onSpaceTypeChange('source');
+                }}
+              >
+                <div className={styles.spacePurposeItem}>
+                  <div
+                    className={`${styles.spacePurposeIcon} ${
+                      currentSpaceIsSource === true
+                        ? styles.spacePurposeIconSelected
+                        : ''
+                    }`}
+                  >
+                    {currentSpaceIsSource === true ? (
+                      <Icon color="primary" icon="Plus" />
+                    ) : null}
+                  </div>
+                  <Paragraph>
+                    <b>
+                      I will be defining design system patterns in this space
+                    </b>
+                  </Paragraph>
+                </div>
+              </Card>
+              <Card
+                selected={currentSpaceIsConsumer}
+                onClick={() => {
+                  currentSpaceIsConsumer
+                    ? appInstallationParameters.spaceType ===
+                      'sourceandconsumer'
+                      ? onSpaceTypeChange('source')
+                      : onSpaceTypeChange(null)
+                    : appInstallationParameters.spaceType === 'source'
+                    ? onSpaceTypeChange('sourceandconsumer')
+                    : onSpaceTypeChange('consumer');
+                }}
+              >
+                <div className={styles.spacePurposeItem}>
+                  <div
+                    className={`${styles.spacePurposeIcon} ${
+                      currentSpaceIsConsumer === true
+                        ? styles.spacePurposeIconSelected
+                        : ''
+                    }`}
+                  >
+                    {currentSpaceIsConsumer === true ? (
+                      <Icon color="primary" icon="Plus" />
+                    ) : null}
+                  </div>
+                  <Paragraph>
+                    <b>
+                      I have content types in this space that I want to document
+                    </b>
+                  </Paragraph>
+                </div>
+              </Card>
+            </div>
+          </Form>
+
+          {currentSpaceIsSource ? (
+            <div className={styles.section}>
+              {contentTypes === null ? (
+                <SkeletonContainer>
+                  <SkeletonBodyText numberOfLines={2} />
+                </SkeletonContainer>
               ) : (
-                <Note>
-                  Installing this app will automatically create a new content
-                  type in this space.
-                </Note>
+                <div>
+                  <Typography>
+                    <Subheading>Design System Source - content type</Subheading>
+                    <Paragraph>
+                      The app will generate a content type in this space that
+                      will serve as your Design System patterns source.
+                    </Paragraph>
+                  </Typography>
+                  {contentTypeExists === true ? (
+                    <Note noteType="positive">
+                      Design System Pattern content type is present in this
+                      space.
+                    </Note>
+                  ) : (
+                    <Note>
+                      Installing this app will automatically create a new
+                      content type in this space.
+                    </Note>
+                  )}
+                </div>
               )}
             </div>
-          )}
-        </div>
+          ) : null}
+
+          {appInstallationParameters.spaceType === 'consumer' ? (
+            <SpaceSelector
+              sdk={sdk}
+              appInstallationParameters={appInstallationParameters}
+              setAppInstallationParameters={setAppInstallationParameters}
+              onVerify={onVerify}
+            />
+          ) : null}
+        </TabPanel>
       ) : null}
 
-      {appInstallationParameters.spaceType === 'consumer' ? (
-        <SpaceSelector
-          sdk={sdk}
-          appInstallationParameters={appInstallationParameters}
-          setAppInstallationParameters={setAppInstallationParameters}
-          onVerify={onVerify}
-        />
-      ) : null}
-
-      {((appInstallationParameters.spaceType || '') === 'sourceandconsumer' &&
-        contentTypeExists === true) ||
-      appInstallationParameters.spaceType === 'consumer' ? (
-        <DesignSystemPatternMatcher
-          sdk={sdk}
-          appInstallationParameters={appInstallationParameters}
-          setAppInstallationParameters={setAppInstallationParameters}
-          contentTypes={contentTypes}
-          sourceDesignSystemPatterns={sourceDesignSystemPatterns}
-        />
+      {activeTab === 'designSystemPatternMatching' ? (
+        <TabPanel
+          id="designSystemPatternMatching"
+          className={styles.tabContainer}
+        >
+          <DesignSystemPatternMatcher
+            sdk={sdk}
+            appInstallationParameters={appInstallationParameters}
+            setAppInstallationParameters={setAppInstallationParameters}
+            contentTypes={contentTypes}
+            sourceDesignSystemPatterns={sourceDesignSystemPatterns}
+          />
+        </TabPanel>
       ) : null}
     </div>
   );

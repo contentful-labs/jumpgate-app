@@ -1,9 +1,4 @@
-.container {
-  border-top: 1px solid var(--color-element-light);
-  padding-top: var(--spacing-l);
-}
-
-.heading {
-  display: flex;
-  justify-content: space-between;
+.contentTypeLabel {
+  font-weight: 500;
+  margin-top: 8px;
 }
