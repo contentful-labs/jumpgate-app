@@ -7,6 +7,12 @@
   padding: var(--spacing-l);
 }
 
+.headerMenu {
+  align-items: center;
+  display: flex;
+  justify-content: space-between;
+}
+
 .tabWithIcon {
   align-items: center;
   display: flex;
@@ -53,4 +59,10 @@
 .spacePurposeIconSelected {
   background-color: var(--color-blue-lightest);
   border-color: var(--color-blue-light);
+}
+
+.goToDesignSystemPatternMatching {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: var(--spacing-m);
 }

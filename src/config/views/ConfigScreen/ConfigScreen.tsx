@@ -17,6 +17,8 @@ import {
   TabPanel,
   Card,
   Icon,
+  IconButton,
+  Button,
 } from '@contentful/forma-36-react-components';
 
 import {
@@ -396,39 +398,43 @@ const Config: React.FC<ConfigProps> = (props) => {
 
   return (
     <div className={styles.container}>
-      <Tabs>
-        <Tab
-          id="spaceType"
-          selected={activeTab === 'spaceType'}
-          onSelect={() => {
-            setActiveTab('spaceType');
-          }}
-          className={styles.tabWithIcon}
-        >
-          Initial Setup{' '}
-          {initialSetupDone ? (
-            <Icon color="positive" icon="CheckCircle" />
-          ) : null}{' '}
-        </Tab>
-        {appInstallationParameters.spaceType === 'consumer' ||
-        appInstallationParameters.spaceType === 'sourceandconsumer' ? (
-          <Tab
-            id="spaceType"
-            selected={activeTab === 'designSystemPatternMatching'}
-            onSelect={() => {
-              setActiveTab('designSystemPatternMatching');
+      <div className={styles.headerMenu}>
+        <Tabs>
+          {activeTab === 'spaceType' ? (
+            <Tab id="spaceType" selected className={styles.tabWithIcon}>
+              Initial Setup{' '}
+              {initialSetupDone ? (
+                <Icon color="positive" icon="CheckCircle" />
+              ) : null}{' '}
+            </Tab>
+          ) : null}
+
+          {(appInstallationParameters.spaceType === 'consumer' ||
+            appInstallationParameters.spaceType === 'sourceandconsumer') &&
+          activeTab === 'designSystemPatternMatching' ? (
+            <Tab
+              id="spaceType"
+              selected
+              disabled={
+                (appInstallationParameters.spaceType === 'sourceandconsumer' &&
+                  contentTypeExists === false) ||
+                (appInstallationParameters.spaceType === 'consumer' &&
+                  appInstallationParameters.sourceConnectionValidated === false)
+              }
+            >
+              Design System Pattern Matching
+            </Tab>
+          ) : null}
+        </Tabs>
+        {activeTab !== 'spaceType' ? (
+          <IconButton
+            iconProps={{ icon: 'Settings', color: 'positive' }}
+            onClick={() => {
+              setActiveTab('spaceType');
             }}
-            disabled={
-              (appInstallationParameters.spaceType === 'sourceandconsumer' &&
-                contentTypeExists === false) ||
-              (appInstallationParameters.spaceType === 'consumer' &&
-                appInstallationParameters.sourceConnectionValidated === false)
-            }
-          >
-            Design System Pattern Matching
-          </Tab>
+          />
         ) : null}
-      </Tabs>
+      </div>
 
       {activeTab === 'spaceType' ? (
         <TabPanel id="spaceType" className={styles.tabContainer}>
@@ -553,6 +559,19 @@ const Config: React.FC<ConfigProps> = (props) => {
               setAppInstallationParameters={setAppInstallationParameters}
               onVerify={onVerify}
             />
+          ) : null}
+
+          {initialSetupDone === true ? (
+            <div className={styles.goToDesignSystemPatternMatching}>
+              <Button
+                onClick={() => {
+                  setActiveTab('designSystemPatternMatching');
+                }}
+                buttonType="primary"
+              >
+                Go to the next step
+              </Button>
+            </div>
           ) : null}
         </TabPanel>
       ) : null}

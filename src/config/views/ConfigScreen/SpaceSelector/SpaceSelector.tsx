@@ -7,8 +7,8 @@ import {
   Subheading,
   TextField,
   Typography,
-  Tag,
   Button,
+  Tag,
 } from '@contentful/forma-36-react-components';
 
 import { AppInstallationParameters } from '../../../../types';
@@ -35,17 +35,6 @@ const SpaceSelector: React.FC<SpaceSelectorProps> = (props) => {
       <Typography>
         <Subheading className={styles.heading}>
           Design System Source - source space
-          <Tag
-            tagType={
-              appInstallationParameters.sourceConnectionValidated
-                ? 'positive'
-                : 'secondary'
-            }
-          >
-            {appInstallationParameters.sourceConnectionValidated
-              ? 'Connection verified'
-              : 'Connection not verified'}
-          </Tag>
         </Subheading>
         <Paragraph>
           You need to provide a Space ID and a matching Delivery API Token of a
@@ -89,7 +78,11 @@ const SpaceSelector: React.FC<SpaceSelectorProps> = (props) => {
           type: 'password',
         }}
       />
-      <Button onClick={onVerify}>Verify connection</Button>
+      {appInstallationParameters.sourceConnectionValidated ? (
+        <Tag tagType="positive">Connection verified</Tag>
+      ) : (
+        <Button onClick={onVerify}>Verify connection</Button>
+      )}
     </Form>
   );
 };
