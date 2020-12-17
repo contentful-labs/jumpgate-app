@@ -41,7 +41,13 @@ const contentType = {
       required: false,
       type: 'RichText',
       validations: [
-        { nodes: { 'embedded-asset-block': [{ size: { min: 0, max: 2 } }] } },
+        {
+          nodes: {
+            'embedded-entry-block': [
+              { linkContentType: [SOURCE_CONTENT_TYPE_ID] },
+            ],
+          },
+        },
         {
           enabledNodeTypes: [
             'heading-1',
@@ -55,6 +61,7 @@ const contentType = {
             'hr',
             'blockquote',
             'embedded-asset-block',
+            'embedded-entry-block',
           ],
           message:
             'Only heading 1, heading 2, heading 3, heading 4, heading 5, heading 6, ordered list, unordered list, horizontal rule, quote, and asset nodes are allowed',

@@ -6,15 +6,6 @@
   padding: 2rem 3rem;
 }
 
-.previewImage {
-  display: block;
-  max-width: 100%;
-}
-
-.richText {
-  font-family: var(--font-stack-primary);
-}
-
 .richText img {
   display: block;
   height: auto;
@@ -23,6 +14,747 @@
   margin-top: var(--spacing-l);
 }
 
-.richText ul li > p {
-  margin-bottom: var(--spacing-xs);
+/*!
+ * awsm.css v3.0.7 (https://igoradamenko.github.io/awsm.css/)
+ * Copyright 2015 Igor Adamenko <mail@igoradamenko.com> (https://igoradamenko.com)
+ * Licensed under MIT (https://github.com/igoradamenko/awsm.css/blob/master/LICENSE.md)
+ */
+.designSystem {
+  font-family: var(--font-stack-primary);
+  line-height: 1.4;
+}
+
+.designSystem h1:not(:last-child),
+.designSystem h2:not(:last-child),
+.designSystem h3:not(:last-child),
+.designSystem h4:not(:last-child),
+.designSystem h5:not(:last-child),
+.designSystem h6:not(:last-child) {
+  margin-bottom: 0.5em;
+}
+
+.designSystem details,
+.designSystem nav {
+  margin: 1em 0;
+}
+.designSystem nav ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.designSystem nav li {
+  display: inline-block;
+  margin-right: 1em;
+  margin-bottom: 0.25em;
+}
+.designSystem nav li:last-child {
+  margin-right: 0;
+}
+.designSystem a,
+.designSystem nav a:visited {
+  color: #0064c1;
+}
+.designSystem article header h1 a:visited:hover,
+.designSystem article header h2 a:visited:hover,
+.designSystem nav a:hover {
+  color: #f00000;
+}
+.designSystem ol,
+.designSystem ul {
+  margin-top: 0;
+  padding-top: 0;
+  padding-left: 2.5em;
+}
+.designSystem article header h1 + p,
+.designSystem article header h2 + p,
+.designSystem ol li + li,
+.designSystem ul li + li {
+  margin-top: 0.25em;
+}
+.designSystem ol li > details,
+.designSystem ul li > details {
+  margin: 0;
+}
+.designSystem p {
+  margin: 1em 0;
+  -webkit-hyphens: auto;
+  -ms-hyphens: auto;
+  hyphens: auto;
+}
+.designSystem aside:first-child,
+.designSystem form legend:first-child + label,
+.designSystem p:first-child {
+  margin-top: 0;
+}
+.designSystem aside:last-child,
+.designSystem p:last-child {
+  margin-bottom: 0;
+}
+.designSystem p + ol,
+.designSystem p + ul {
+  margin-top: -0.75em;
+}
+.designSystem p img,
+.designSystem p picture {
+  float: right;
+  margin-bottom: 0.5em;
+  margin-left: 0.5em;
+}
+.designSystem p picture img {
+  float: none;
+  margin: 0;
+}
+.designSystem blockquote,
+.designSystem dd {
+  padding-left: 2.5em;
+}
+.designSystem dd {
+  margin-bottom: 1em;
+  margin-left: 0;
+}
+.designSystem dt {
+  font-weight: 700;
+}
+.designSystem blockquote {
+  margin: 0;
+}
+.designSystem aside {
+  margin: 0.5em 0;
+  font-style: italic;
+  color: #aaa;
+}
+@media (min-width: 65rem) {
+  .designSystem aside {
+    position: absolute;
+    right: -12.5rem;
+    width: 9.375rem;
+    max-width: 9.375rem;
+    margin: 0;
+    padding-left: 0.5em;
+    font-size: 0.8em;
+    border-left: 1px solid #f2f2f2;
+  }
+}
+.designSystem section + section {
+  margin-top: 2em;
+}
+.designSystem h1,
+.designSystem h2,
+.designSystem h3,
+.designSystem h4,
+.designSystem h5,
+.designSystem h6 {
+  margin: 1.3em 0 0;
+  line-height: 1.2;
+}
+.designSystem h1:focus > a[href^='#'][id]:empty,
+.designSystem h1:hover > a[href^='#'][id]:empty,
+.designSystem h2:focus > a[href^='#'][id]:empty,
+.designSystem h2:hover > a[href^='#'][id]:empty,
+.designSystem h3:focus > a[href^='#'][id]:empty,
+.designSystem h3:hover > a[href^='#'][id]:empty,
+.designSystem h4:focus > a[href^='#'][id]:empty,
+.designSystem h4:hover > a[href^='#'][id]:empty,
+.designSystem h5:focus > a[href^='#'][id]:empty,
+.designSystem h5:hover > a[href^='#'][id]:empty,
+.designSystem h6:focus > a[href^='#'][id]:empty,
+.designSystem h6:hover > a[href^='#'][id]:empty {
+  opacity: 1;
+}
+.designSystem figure + p,
+.designSystem h1 + details,
+.designSystem h1 + p,
+.designSystem h2 + details,
+.designSystem h2 + p,
+.designSystem h3 + details,
+.designSystem h3 + p,
+.designSystem h4 + details,
+.designSystem h4 + p,
+.designSystem h5 + details,
+.designSystem h5 + p,
+.designSystem h6 + details,
+.designSystem h6 + p {
+  margin-top: 0.5em;
+}
+.designSystem h1 > a[href^='#'][id]:empty,
+.designSystem h2 > a[href^='#'][id]:empty,
+.designSystem h3 > a[href^='#'][id]:empty,
+.designSystem h4 > a[href^='#'][id]:empty,
+.designSystem h5 > a[href^='#'][id]:empty,
+.designSystem h6 > a[href^='#'][id]:empty {
+  position: absolute;
+  left: -0.65em;
+  opacity: 0;
+  text-decoration: none;
+  font-weight: 400;
+  line-height: 1;
+  color: #aaa;
+}
+@media (min-width: 40rem) {
+  .designSystem h1 > a[href^='#'][id]:empty,
+  .designSystem h2 > a[href^='#'][id]:empty,
+  .designSystem h3 > a[href^='#'][id]:empty,
+  .designSystem h4 > a[href^='#'][id]:empty,
+  .designSystem h5 > a[href^='#'][id]:empty,
+  .designSystem h6 > a[href^='#'][id]:empty {
+    left: -0.8em;
+  }
+}
+.designSystem h1 > a[href^='#'][id]:empty:focus,
+.designSystem h1 > a[href^='#'][id]:empty:hover,
+.designSystem h1 > a[href^='#'][id]:empty:target,
+.designSystem h2 > a[href^='#'][id]:empty:focus,
+.designSystem h2 > a[href^='#'][id]:empty:hover,
+.designSystem h2 > a[href^='#'][id]:empty:target,
+.designSystem h3 > a[href^='#'][id]:empty:focus,
+.designSystem h3 > a[href^='#'][id]:empty:hover,
+.designSystem h3 > a[href^='#'][id]:empty:target,
+.designSystem h4 > a[href^='#'][id]:empty:focus,
+.designSystem h4 > a[href^='#'][id]:empty:hover,
+.designSystem h4 > a[href^='#'][id]:empty:target,
+.designSystem h5 > a[href^='#'][id]:empty:focus,
+.designSystem h5 > a[href^='#'][id]:empty:hover,
+.designSystem h5 > a[href^='#'][id]:empty:target,
+.designSystem h6 > a[href^='#'][id]:empty:focus,
+.designSystem h6 > a[href^='#'][id]:empty:hover,
+.designSystem h6 > a[href^='#'][id]:empty:target {
+  opacity: 1;
+  box-shadow: none;
+  color: #000;
+}
+.designSystem h1 > a[href^='#'][id]:empty:target:focus,
+.designSystem h2 > a[href^='#'][id]:empty:target:focus,
+.designSystem h3 > a[href^='#'][id]:empty:target:focus,
+.designSystem h4 > a[href^='#'][id]:empty:target:focus,
+.designSystem h5 > a[href^='#'][id]:empty:target:focus,
+.designSystem h6 > a[href^='#'][id]:empty:target:focus {
+  outline: 0;
+}
+.designSystem h1 > a[href^='#'][id]:empty::before,
+.designSystem h2 > a[href^='#'][id]:empty::before,
+.designSystem h3 > a[href^='#'][id]:empty::before,
+.designSystem h4 > a[href^='#'][id]:empty::before,
+.designSystem h5 > a[href^='#'][id]:empty::before,
+.designSystem h6 > a[href^='#'][id]:empty::before {
+  content: '§ ';
+}
+.designSystem h1 {
+  font-size: 2.5em;
+}
+.designSystem h2 {
+  font-size: 1.75em;
+}
+.designSystem h3 {
+  font-size: 1.25em;
+}
+.designSystem h4 {
+  font-size: 1.15em;
+}
+.designSystem a abbr,
+.designSystem h5,
+.designSystem h6 {
+  font-size: 1em;
+}
+.designSystem h6 {
+  margin-top: 1em;
+}
+.designSystem article + article {
+  margin-top: 4em;
+}
+.designSystem article header p {
+  font-size: 0.6em;
+  color: #aaa;
+}
+.designSystem article header p + h1,
+.designSystem article header p + h2 {
+  margin-top: -0.25em;
+}
+.designSystem article header h1 a,
+.designSystem article header h2 a {
+  color: #000;
+}
+.designSystem article header h1 a:visited,
+.designSystem article header h2 a:visited,
+.designSystem h6,
+.designSystem legend {
+  color: #aaa;
+}
+.designSystem article > footer {
+  margin-top: 1.5em;
+  font-size: 0.85em;
+}
+.designSystem a:visited {
+  color: #8d39d0;
+}
+.designSystem a:active,
+.designSystem a:hover {
+  outline-width: 0;
+}
+.designSystem a:hover {
+  color: #f00000;
+}
+.designSystem abbr {
+  margin-right: -0.075em;
+  text-decoration: none;
+  -webkit-hyphens: none;
+  -ms-hyphens: none;
+  hyphens: none;
+  letter-spacing: 0.075em;
+  font-size: 0.9em;
+}
+.designSystem img,
+.designSystem picture {
+  display: block;
+  max-width: 100%;
+  margin: 0 auto;
+}
+.designSystem audio,
+.designSystem video {
+  width: 100%;
+  max-width: 100%;
+}
+.designSystem figure {
+  margin: 1em 0 0.5em;
+  padding: 0;
+}
+.designSystem figure figcaption {
+  opacity: 0.65;
+  font-size: 0.85em;
+}
+.designSystem table {
+  display: inline-block;
+  border-spacing: 0;
+  border-collapse: collapse;
+  overflow-x: auto;
+  max-width: 100%;
+  text-align: left;
+  vertical-align: top;
+  background: linear-gradient(rgba(0, 0, 0, 0.15) 0%, rgba(0, 0, 0, 0.15) 100%)
+      0 0,
+    linear-gradient(rgba(0, 0, 0, 0.15) 0%, rgba(0, 0, 0, 0.15) 100%) 100% 0;
+  background-attachment: scroll, scroll;
+  background-size: 1px 100%, 1px 100%;
+  background-repeat: no-repeat, no-repeat;
+}
+.designSystem table caption {
+  font-size: 0.9em;
+  background: #fff;
+}
+.designSystem table td,
+.designSystem table th {
+  padding: 0.35em 0.75em;
+  vertical-align: top;
+  font-size: 0.9em;
+  border: 1px solid #f2f2f2;
+  border-top: 0;
+  border-left: 0;
+}
+.designSystem table td:first-child,
+.designSystem table th:first-child {
+  padding-left: 0;
+  background-image: linear-gradient(
+    to right,
+    #fff 50%,
+    rgba(255, 255, 255, 0) 100%
+  );
+  background-size: 2px 100%;
+  background-repeat: no-repeat;
+}
+.designSystem table td:last-child,
+.designSystem table th:last-child {
+  padding-right: 0;
+  border-right: 0;
+  background-image: linear-gradient(
+    to left,
+    #fff 50%,
+    rgba(255, 255, 255, 0) 100%
+  );
+  background-position: 100% 0;
+  background-size: 2px 100%;
+  background-repeat: no-repeat;
+}
+.designSystem table td:only-child,
+.designSystem table th:only-child {
+  background-image: linear-gradient(
+      to right,
+      #fff 50%,
+      rgba(255, 255, 255, 0) 100%
+    ),
+    linear-gradient(to left, #fff 50%, rgba(255, 255, 255, 0) 100%);
+  background-position: 0 0, 100% 0;
+  background-size: 2px 100%, 2px 100%;
+  background-repeat: no-repeat, no-repeat;
+}
+.designSystem table th {
+  line-height: 1.2;
+}
+.designSystem form {
+  margin-right: auto;
+  margin-left: auto;
+}
+@media (min-width: 40rem) {
+  .designSystem form {
+    max-width: 80%;
+  }
+}
+.designSystem form label,
+.designSystem form select,
+.designSystem output {
+  display: block;
+}
+.designSystem form label:not(:first-child) {
+  margin-top: 1em;
+}
+.designSystem form p label {
+  display: inline;
+}
+.designSystem form p label + label {
+  margin-left: 1em;
+}
+.designSystem form input[type],
+.designSystem form select,
+.designSystem form textarea {
+  margin-bottom: 1em;
+}
+.designSystem form input[type='checkbox'],
+.designSystem form input[type='radio'] {
+  margin-bottom: 0;
+}
+.designSystem button,
+.designSystem fieldset {
+  margin: 0;
+  border: 1px solid #aaa;
+}
+.designSystem fieldset {
+  padding: 0.5em 1em;
+}
+.designSystem button {
+  outline: 0;
+  box-sizing: border-box;
+  height: 2em;
+  padding: calc(0.25em - 1px) 0.5em;
+  font-family: inherit;
+  font-size: 1em;
+  border-radius: 2px;
+  background: #fff;
+  display: inline-block;
+  width: auto;
+  background: #f2f2f2;
+  color: #000;
+  cursor: pointer;
+}
+.designSystem button:focus,
+.designSystem input[type='email']:focus,
+.designSystem input[type='month']:focus,
+.designSystem input[type='number']:focus,
+.designSystem input[type='password']:focus,
+.designSystem input[type='search']:focus,
+.designSystem input[type='tel']:focus,
+.designSystem input[type='text']:focus,
+.designSystem input[type='time']:focus,
+.designSystem input[type='url']:focus,
+.designSystem input[type='week']:focus,
+.designSystem input[type^='date']:focus,
+.designSystem select:focus {
+  border: 1px solid #000;
+}
+.designSystem button:not([disabled]):hover,
+.designSystem input[type='button']:not([disabled]):hover,
+.designSystem input[type='file']:not([disabled]):hover,
+.designSystem input[type='reset']:not([disabled]):hover,
+.designSystem input[type='submit']:not([disabled]):hover,
+.designSystem select:not([disabled]):hover {
+  border: 1px solid #000;
+}
+.designSystem button:active,
+.designSystem select:active {
+  background-color: #aaa;
+}
+.designSystem button[disabled],
+.designSystem select[disabled] {
+  color: #aaa;
+  cursor: not-allowed;
+}
+.designSystem select {
+  outline: 0;
+  box-sizing: border-box;
+  height: 2em;
+  margin: 0;
+  padding: calc(0.25em - 1px) 0.5em;
+  font-family: inherit;
+  font-size: 1em;
+  border: 1px solid #aaa;
+  border-radius: 2px;
+  background: #fff;
+  display: inline-block;
+  width: auto;
+  background: #f2f2f2;
+  color: #000;
+  cursor: pointer;
+  padding-right: 1.2em;
+  background-position: top 55% right 0.35em;
+  background-size: 0.5em;
+  background-repeat: no-repeat;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 3 2'%3E%3Cpath fill='rgb(170, 170, 170)' fill-rule='nonzero' d='M1.5 2L3 0H0z'/%3E%3C/svg%3E");
+}
+.designSystem select:not([disabled]):focus,
+.designSystem select:not([disabled]):hover {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 3 2'%3E%3Cpath fill='rgb(0, 0, 0)' fill-rule='nonzero' d='M1.5 2L3 0H0z'/%3E%3C/svg%3E");
+}
+.designSystem input[type='email'],
+.designSystem input[type='month'],
+.designSystem input[type='number'],
+.designSystem input[type='password'],
+.designSystem input[type='search'],
+.designSystem input[type='tel'],
+.designSystem input[type='text'],
+.designSystem input[type='time'],
+.designSystem input[type='url'],
+.designSystem input[type='week'],
+.designSystem input[type^='date'] {
+  outline: 0;
+  box-sizing: border-box;
+  height: 2em;
+  margin: 0;
+  padding: calc(0.25em - 1px) 0.5em;
+  font-family: inherit;
+  font-size: 1em;
+  border: 1px solid #aaa;
+  border-radius: 2px;
+  background: #fff;
+  color: #000;
+  display: block;
+  width: 100%;
+  line-height: calc(2em - 1px * 2 - (0.25em - 1px) * 2);
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+}
+.designSystem input[type='email']::-moz-placeholder,
+.designSystem input[type='month']::-moz-placeholder,
+.designSystem input[type='number']::-moz-placeholder,
+.designSystem input[type='password']::-moz-placeholder,
+.designSystem input[type='search']::-moz-placeholder,
+.designSystem input[type='tel']::-moz-placeholder,
+.designSystem input[type='text']::-moz-placeholder,
+.designSystem input[type='time']::-moz-placeholder,
+.designSystem input[type='url']::-moz-placeholder,
+.designSystem input[type='week']::-moz-placeholder,
+.designSystem input[type^='date']::-moz-placeholder {
+  color: #aaa;
+}
+.designSystem input[type='email']::-webkit-input-placeholder,
+.designSystem input[type='month']::-webkit-input-placeholder,
+.designSystem input[type='number']::-webkit-input-placeholder,
+.designSystem input[type='password']::-webkit-input-placeholder,
+.designSystem input[type='search']::-webkit-input-placeholder,
+.designSystem input[type='tel']::-webkit-input-placeholder,
+.designSystem input[type='text']::-webkit-input-placeholder,
+.designSystem input[type='time']::-webkit-input-placeholder,
+.designSystem input[type='url']::-webkit-input-placeholder,
+.designSystem input[type='week']::-webkit-input-placeholder,
+.designSystem input[type^='date']::-webkit-input-placeholder {
+  color: #aaa;
+}
+.designSystem input[type='email']:-ms-input-placeholder,
+.designSystem input[type='month']:-ms-input-placeholder,
+.designSystem input[type='number']:-ms-input-placeholder,
+.designSystem input[type='password']:-ms-input-placeholder,
+.designSystem input[type='search']:-ms-input-placeholder,
+.designSystem input[type='tel']:-ms-input-placeholder,
+.designSystem input[type='text']:-ms-input-placeholder,
+.designSystem input[type='time']:-ms-input-placeholder,
+.designSystem input[type='url']:-ms-input-placeholder,
+.designSystem input[type='week']:-ms-input-placeholder,
+.designSystem input[type^='date']:-ms-input-placeholder {
+  color: #aaa;
+}
+.designSystem input[type='button'],
+.designSystem input[type='reset'],
+.designSystem input[type='submit'] {
+  outline: 0;
+  box-sizing: border-box;
+  height: 2em;
+  margin: 0;
+  padding: calc(0.25em - 1px) 0.5em;
+  font-family: inherit;
+  font-size: 1em;
+  border: 1px solid #aaa;
+  border-radius: 2px;
+  background: #fff;
+  display: inline-block;
+  width: auto;
+  background: #f2f2f2;
+  color: #000;
+  cursor: pointer;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+}
+.designSystem input[type='button']:focus,
+.designSystem input[type='reset']:focus,
+.designSystem input[type='submit']:focus {
+  border: 1px solid #000;
+}
+.designSystem input[type='button']:active,
+.designSystem input[type='reset']:active,
+.designSystem input[type='submit']:active {
+  background-color: #aaa;
+}
+.designSystem input[type='button'][disabled],
+.designSystem input[type='reset'][disabled],
+.designSystem input[type='submit'][disabled] {
+  color: #aaa;
+  cursor: not-allowed;
+}
+.designSystem input[type='color'] {
+  outline: 0;
+  box-sizing: border-box;
+  height: 2em;
+  margin: 0;
+  padding: calc(0.25em - 1px) 0.5em;
+  font-family: inherit;
+  font-size: 1em;
+  border: 1px solid #aaa;
+  border-radius: 2px;
+  background: #fff;
+  color: #000;
+  display: block;
+  line-height: calc(2em - 1px * 2 - (0.25em - 1px) * 2);
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+  width: 6em;
+}
+.designSystem input[type='color']:focus {
+  border: 1px solid #000;
+}
+.designSystem input[type='color']::-moz-placeholder,
+.designSystem textarea::-moz-placeholder {
+  color: #aaa;
+}
+.designSystem input[type='color']::-webkit-input-placeholder,
+.designSystem textarea::-webkit-input-placeholder {
+  color: #aaa;
+}
+.designSystem input[type='color']:-ms-input-placeholder {
+  color: #aaa;
+}
+.designSystem input[type='color']:hover {
+  border: 1px solid #000;
+}
+.designSystem input[type='file'] {
+  outline: 0;
+  box-sizing: border-box;
+  margin: 0;
+  padding: calc(0.25em - 1px) 0.5em;
+  font-family: inherit;
+  border: 1px solid #aaa;
+  border-radius: 2px;
+  background: #fff;
+  background: #f2f2f2;
+  color: #000;
+  cursor: pointer;
+  display: block;
+  width: 100%;
+  height: auto;
+  padding: 0.75em 0.5em;
+  font-size: 12px;
+  line-height: 1;
+}
+.designSystem input[type='file']:focus,
+.designSystem textarea:focus {
+  border: 1px solid #000;
+}
+.designSystem input[type='file']:active {
+  background-color: #aaa;
+}
+.designSystem input[type='file'][disabled] {
+  color: #aaa;
+  cursor: not-allowed;
+}
+.designSystem input[type='checkbox'],
+.designSystem input[type='radio'] {
+  margin: -0.2em 0.75em 0 0;
+  vertical-align: middle;
+}
+.designSystem textarea {
+  outline: 0;
+  box-sizing: border-box;
+  margin: 0;
+  padding: calc(0.25em - 1px) 0.5em;
+  font-family: inherit;
+  font-size: 1em;
+  border: 1px solid #aaa;
+  border-radius: 2px;
+  background: #fff;
+  color: #000;
+  display: block;
+  width: 100%;
+  line-height: calc(2em - 1px * 2 - (0.25em - 1px) * 2);
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+  height: 4.5em;
+  resize: vertical;
+  padding-top: 0.5em;
+  padding-bottom: 0.5em;
+}
+.designSystem textarea:-ms-input-placeholder {
+  color: #aaa;
+}
+.designSystem code,
+.designSystem kbd,
+.designSystem samp,
+.designSystem var {
+  font-family: Consolas, 'Lucida Console', Monaco, monospace;
+  font-style: normal;
+}
+.designSystem pre {
+  overflow-x: auto;
+  font-size: 0.8em;
+  background: linear-gradient(rgba(0, 0, 0, 0.15) 0%, rgba(0, 0, 0, 0.15) 100%)
+      0 0,
+    linear-gradient(rgba(0, 0, 0, 0.15) 0%, rgba(0, 0, 0, 0.15) 100%) 100% 0;
+  background-attachment: scroll, scroll;
+  background-size: 1px 100%, 1px 100%;
+  background-repeat: no-repeat, no-repeat;
+}
+.designSystem pre > code,
+.designSystem summary {
+  display: inline-block;
+}
+.designSystem pre > code {
+  overflow-x: visible;
+  box-sizing: border-box;
+  min-width: 100%;
+  border-right: 3px solid #fff;
+  border-left: 1px solid #fff;
+}
+.designSystem hr {
+  height: 1px;
+  margin: 2em 0;
+  border: 0;
+  background: #f2f2f2;
+}
+.designSystem details[open] {
+  padding-bottom: 0.5em;
+  border-bottom: 1px solid #f2f2f2;
+}
+.designSystem summary {
+  font-weight: 700;
+  border-bottom: 1px dashed;
+  cursor: pointer;
+}
+.designSystem summary::-webkit-details-marker {
+  display: none;
+}
+.designSystem noscript {
+  color: #d00000;
+}
+.designSystem ::selection {
+  background: rgba(0, 100, 193, 0.25);
 }
