@@ -5,11 +5,7 @@ import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import {
   SkeletonContainer,
   SkeletonBodyText,
-  Heading,
-  Typography,
   EmptyState,
-  Paragraph,
-  Subheading,
 } from '@contentful/forma-36-react-components';
 import {
   documentToReactComponents,
@@ -120,24 +116,53 @@ const EntryEditor: React.FC<ConfigProps> = (props) => {
     ],
   );
 
+  const [designSystemPatterns, setDesignSystemPatterns] = useState<
+    Record<string, Entry<DesignSystemPatternFields> | null | undefined>
+  >({});
+
+  const loadDesignSystemPattern = useCallback(
+    async (entryId: string): Promise<void> => {
+      setDesignSystemPatterns({
+        ...designSystemPatterns,
+        [entryId]: null,
+      });
+
+      let loadedDesignSystemPattern = null;
+
+      if (installationParameters.spaceType === 'consumer') {
+        loadedDesignSystemPattern = await getExternalSourceDesignSystemPattern(
+          installationParameters.sourceSpaceId!,
+          installationParameters.sourceDeliveryToken!,
+          entryId,
+        );
+      } else if (installationParameters.spaceType === 'sourceandconsumer') {
+        loadedDesignSystemPattern = await getSourceDesignSystemPattern(
+          sdk,
+          entryId,
+        );
+      }
+
+      if (loadedDesignSystemPattern === null) {
+        return;
+      }
+
+      setDesignSystemPatterns({
+        ...designSystemPatterns,
+        [entryId]: loadedDesignSystemPattern,
+      });
+    },
+    [
+      designSystemPatterns,
+      installationParameters.sourceDeliveryToken,
+      installationParameters.sourceSpaceId,
+      installationParameters.spaceType,
+      sdk,
+    ],
+  );
+
   const richTextOptions = useMemo(() => {
     const options: Options = {
       renderNode: {
-        [BLOCKS.HEADING_1]: (_node, children) => {
-          return <Heading>{children}</Heading>;
-        },
-        [BLOCKS.HEADING_2]: (_node, children) => {
-          return <Subheading>{children}</Subheading>;
-        },
-        [BLOCKS.HEADING_3]: (_node, children) => {
-          return <Subheading element="h3">{children}</Subheading>;
-        },
-        [BLOCKS.HEADING_4]: (_node, children) => {
-          return <Subheading element="h4">{children}</Subheading>;
-        },
-        [BLOCKS.PARAGRAPH]: (_node, children) => {
-          return <Paragraph>{children}</Paragraph>;
-        },
         [BLOCKS.EMBEDDED_ASSET]: (node) => {
           const assetId = node.data.target.sys.id;
           const asset = assets[assetId];
@@ -157,58 +182,39 @@ const EntryEditor: React.FC<ConfigProps> = (props) => {
           );
 
           return (
-            <img
-              src={file.url}
-              alt={getEntryFieldValue(
-                asset.fields.title,
-                asset.sys.locale || sdk.locales.default,
-              )}
-              width={file.details.image.width}
-              height={file.details.image.height}
-            />
+            <figure>
+              <img
+                src={file.url}
+                alt={getEntryFieldValue(
+                  asset.fields.title,
+                  asset.sys.locale || sdk.locales.default,
+                )}
+                width={file.details.image.width}
+                height={file.details.image.height}
+              />
+              <figcaption>
+                {getEntryFieldValue(
+                  asset.fields.description,
+                  asset.sys.locale || sdk.locales.default,
+                )}
+              </figcaption>
+            </figure>
           );
         },
-      },
-    };
+        [BLOCKS.EMBEDDED_ENTRY]: (node) => {
+          const entryId = node.data.target.sys.id;
+          const designSystemPattern = designSystemPatterns[entryId];
 
-    return options;
-  }, [assets, loadAsset, sdk.locales.default]);
+          if (designSystemPattern === undefined) {
+            loadDesignSystemPattern(entryId);
+            return null;
+          }
 
-  return (
-    <div className={styles.container}>
-      {designSystemPattern === undefined ? (
-        <>
-          <SkeletonContainer>
-            <SkeletonBodyText numberOfLines={4} />
-          </SkeletonContainer>
-        </>
-      ) : designSystemPattern === null ? (
-        <EmptyState
-          headingProps={{ text: 'Design System not available' }}
-          descriptionProps={{
-            text:
-              'Failed to load the design system documentation for this content type.',
-          }}
-        />
-      ) : (
-        <>
-          <Typography>
-            <Paragraph>
-              Last updated on:{' '}
-              {new Date(designSystemPattern.sys.updatedAt).toLocaleDateString()}
-            </Paragraph>
-            <Heading>
-              {getEntryFieldValue(
-                designSystemPattern.fields.name,
-                designSystemPattern.sys.locale || sdk.locales.default,
-              )}
-            </Heading>
-            <Paragraph>
-              {getEntryFieldValue(
-                designSystemPattern.fields.description,
-                designSystemPattern.sys.locale || sdk.locales.default,
-              )}
-            </Paragraph>
+          if (designSystemPattern === null) {
+            return null;
+          }
+
+          return (
             <div className={styles.richText}>
               {documentToReactComponents(
                 getEntryFieldValue(
@@ -218,9 +224,67 @@ const EntryEditor: React.FC<ConfigProps> = (props) => {
                 richTextOptions,
               )}
             </div>
-          </Typography>
-        </>
-      )}
+          );
+        },
+      },
+    };
+
+    return options;
+  }, [
+    assets,
+    loadAsset,
+    designSystemPatterns,
+    loadDesignSystemPattern,
+    sdk.locales.default,
+  ]);
+
+  return (
+    <div className={styles.designSystem}>
+      <div className={styles.container}>
+        {designSystemPattern === undefined ? (
+          <>
+            <SkeletonContainer>
+              <SkeletonBodyText numberOfLines={4} />
+            </SkeletonContainer>
+          </>
+        ) : designSystemPattern === null ? (
+          <EmptyState
+            headingProps={{ text: 'Design System not available' }}
+            descriptionProps={{
+              text:
+                'Failed to load the design system documentation for this content type.',
+            }}
+          />
+        ) : (
+          <>
+            <p>
+              Last updated on:{' '}
+              {new Date(designSystemPattern.sys.updatedAt).toLocaleDateString()}
+            </p>
+            <h2>
+              {getEntryFieldValue(
+                designSystemPattern.fields.name,
+                designSystemPattern.sys.locale || sdk.locales.default,
+              )}
+            </h2>
+            <p>
+              {getEntryFieldValue(
+                designSystemPattern.fields.description,
+                designSystemPattern.sys.locale || sdk.locales.default,
+              )}
+            </p>
+            <div className={styles.richText}>
+              {documentToReactComponents(
+                getEntryFieldValue(
+                  designSystemPattern.fields.contentGuidelines,
+                  designSystemPattern.sys.locale || sdk.locales.default,
+                ),
+                richTextOptions,
+              )}
+            </div>
+          </>
+        )}
+      </div>
     </div>
   );
 };
