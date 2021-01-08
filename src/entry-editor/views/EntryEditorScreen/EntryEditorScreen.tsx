@@ -267,6 +267,20 @@ const EntryEditor: React.FC<ConfigProps> = (props) => {
                 designSystemPattern.sys.locale || sdk.locales.default,
               )}
             </h2>
+            {getEntryFieldValue(
+              designSystemPattern.fields.iframePreviewUrl,
+              designSystemPattern.sys.locale || sdk.locales.default,
+            ) ? (
+              <div className={styles.iframeContainer}>
+                <iframe
+                  title="Preview"
+                  src={getEntryFieldValue(
+                    designSystemPattern.fields.iframePreviewUrl,
+                    designSystemPattern.sys.locale || sdk.locales.default,
+                  )}
+                />
+              </div>
+            ) : null}
             <p>
               {getEntryFieldValue(
                 designSystemPattern.fields.description,

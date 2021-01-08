@@ -14,6 +14,20 @@
   margin-top: var(--spacing-l);
 }
 
+.iframeContainer {
+  padding-bottom: 56.5%;
+  position: relative;
+}
+
+.iframeContainer iframe {
+  border: 0;
+  height: 100%;
+  left: 0;
+  position: absolute;
+  top: 0;
+  width: 100%;
+}
+
 /*!
  * awsm.css v3.0.7 (https://igoradamenko.github.io/awsm.css/)
  * Copyright 2015 Igor Adamenko <mail@igoradamenko.com> (https://igoradamenko.com)
