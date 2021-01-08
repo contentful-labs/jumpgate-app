@@ -68,6 +68,21 @@ const contentType = {
         },
       ],
     },
+    {
+      id: 'iframePreviewUrl',
+      name: 'iframe preview URL',
+      required: false,
+      type: 'Symbol',
+      validations: [
+        {
+          regexp: {
+            flags: null,
+            pattern:
+              '^(ftp|http|https):\\/\\/(\\w+:{0,1}\\w*@)?(\\S+)(:[0-9]+)?(\\/|\\/([\\w#!:.?+=&%@!\\-/]))?$',
+          },
+        },
+      ],
+    },
   ],
 };
 

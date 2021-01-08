@@ -12,4 +12,5 @@ export interface DesignSystemPatternFields {
   name: string;
   description: string;
   contentGuidelines: RichTextContent;
+  iframePreviewUrl: string;
 }

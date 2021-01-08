@@ -297,7 +297,9 @@ const Config: React.FC<ConfigProps> = (props) => {
       const currentState = (await sdk.app.getCurrentState()) || {
         EditorInterface: {},
       };
-      const newState = {
+      const newState: {
+        EditorInterface: Record<string, any>;
+      } = {
         ...currentState,
         EditorInterface: {
           ...currentState.EditorInterface,
@@ -324,6 +326,41 @@ const Config: React.FC<ConfigProps> = (props) => {
           ),
         },
       };
+
+      // Not supported at the moment, the extensibility team is working on it
+
+      // if (appInstallationParametersToSave.spaceType !== 'consumer') {
+      //   // The space contains the design system patterns content type,
+      //   // let's update its interface
+      //   newState.EditorInterface[SOURCE_CONTENT_TYPE_ID] = {
+      //     controls: [
+      //       {
+      //         fieldId: 'name',
+      //         widgetId: 'singleLine',
+      //         widgetNamespace: 'builtin',
+      //       },
+      //       {
+      //         fieldId: 'description',
+      //         widgetId: 'singleLine',
+      //         widgetNamespace: 'builtin',
+      //       },
+      //       {
+      //         fieldId: 'contentGuidelines',
+      //         widgetId: 'richTextEditor',
+      //         widgetNamespace: 'builtin',
+      //       },
+      //       {
+      //         fieldId: 'iframePreviewUrl',
+      //         settings: {
+      //           helpText:
+      //             'This could be a Storybook or any other URL where your component preview is hosted',
+      //         },
+      //         widgetId: 'urlEditor',
+      //         widgetNamespace: 'builtin',
+      //       },
+      //     ],
+      //   };
+      // }
 
       return {
         parameters: appInstallationParametersToSave,
