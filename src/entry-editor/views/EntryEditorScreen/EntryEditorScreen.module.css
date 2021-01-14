@@ -1,9 +1,24 @@
 .container {
   height: auto;
-  margin: 0 auto;
   margin: 2rem auto 0;
   max-width: 768px;
   padding: 2rem 3rem;
+}
+
+.previewIntro {
+  align-items: baseline;
+  display: flex;
+  justify-content: space-between;
+  margin: 0 auto;
+  max-width: 768px;
+  padding: 0 3rem;
+}
+
+.containerPreview {
+  height: auto;
+  margin: 0 auto;
+  max-width: 1200px;
+  padding: 1rem 3rem;
 }
 
 .richText img {
@@ -20,7 +35,7 @@
 }
 
 .iframeContainer iframe {
-  border: 0;
+  border: 2px dashed var(--color-ice-dark);
   height: 100%;
   left: 0;
   position: absolute;
