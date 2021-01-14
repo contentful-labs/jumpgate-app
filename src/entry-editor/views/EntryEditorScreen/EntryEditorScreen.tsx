@@ -1,4 +1,4 @@
-import { Entry, Asset } from 'contentful';
+import { Entry } from 'contentful';
 import { EditorExtensionSDK } from 'contentful-ui-extensions-sdk';
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
 
@@ -6,6 +6,11 @@ import {
   SkeletonContainer,
   SkeletonBodyText,
   EmptyState,
+  Subheading,
+  Paragraph,
+  Heading,
+  Typography,
+  Button,
 } from '@contentful/forma-36-react-components';
 import {
   documentToReactComponents,
@@ -14,16 +19,15 @@ import {
 import { BLOCKS } from '@contentful/rich-text-types';
 
 import {
-  getSourceAsset,
   getSourceDesignSystemPattern,
   getExternalSourceDesignSystemPattern,
-  getExternalSourceAsset,
 } from '../../../config/getSourceDesignSystemPatterns';
 import {
   AppInstallationParameters,
   DesignSystemPatternFields,
 } from '../../../types';
 import getEntryFieldValue from '../../../utils/getEntryFieldValue';
+import LazyAsset from '../../components/LazyAsset';
 import styles from './EntryEditorScreen.module.css';
 
 interface ConfigProps {
@@ -75,47 +79,6 @@ const EntryEditor: React.FC<ConfigProps> = (props) => {
     sdk.contentType.sys.id,
   ]);
 
-  const [assets, setAssets] = useState<
-    Record<string, Asset | null | undefined>
-  >({});
-
-  const loadAsset = useCallback(
-    async (assetId: string): Promise<void> => {
-      setAssets({
-        ...assets,
-        [assetId]: null,
-      });
-
-      let loadedAsset = null;
-
-      if (installationParameters.spaceType === 'consumer') {
-        loadedAsset = await getExternalSourceAsset(
-          installationParameters.sourceSpaceId!,
-          installationParameters.sourceDeliveryToken!,
-          assetId,
-        );
-      } else if (installationParameters.spaceType === 'sourceandconsumer') {
-        loadedAsset = await getSourceAsset(sdk, assetId);
-      }
-
-      if (loadedAsset === null) {
-        return;
-      }
-
-      setAssets({
-        ...assets,
-        [assetId]: loadedAsset,
-      });
-    },
-    [
-      assets,
-      installationParameters.sourceDeliveryToken,
-      installationParameters.sourceSpaceId,
-      installationParameters.spaceType,
-      sdk,
-    ],
-  );
-
   const [designSystemPatterns, setDesignSystemPatterns] = useState<
     Record<string, Entry<DesignSystemPatternFields> | null | undefined>
   >({});
@@ -165,41 +128,7 @@ const EntryEditor: React.FC<ConfigProps> = (props) => {
       renderNode: {
         [BLOCKS.EMBEDDED_ASSET]: (node) => {
           const assetId = node.data.target.sys.id;
-          const asset = assets[assetId];
-
-          if (asset === undefined) {
-            loadAsset(assetId);
-            return null;
-          }
-
-          if (asset === null) {
-            return null;
-          }
-
-          const file = getEntryFieldValue(
-            asset.fields.file,
-            asset.sys.locale || sdk.locales.default,
-          );
-
-          return (
-            <figure>
-              <img
-                src={file.url}
-                alt={getEntryFieldValue(
-                  asset.fields.title,
-                  asset.sys.locale || sdk.locales.default,
-                )}
-                width={file.details.image.width}
-                height={file.details.image.height}
-              />
-              <figcaption>
-                {getEntryFieldValue(
-                  asset.fields.description,
-                  asset.sys.locale || sdk.locales.default,
-                )}
-              </figcaption>
-            </figure>
-          );
+          return <LazyAsset id={assetId} sdk={sdk} />;
         },
         [BLOCKS.EMBEDDED_ENTRY]: (node) => {
           const entryId = node.data.target.sys.id;
@@ -230,24 +159,34 @@ const EntryEditor: React.FC<ConfigProps> = (props) => {
     };
 
     return options;
-  }, [
-    assets,
-    loadAsset,
-    designSystemPatterns,
-    loadDesignSystemPattern,
-    sdk.locales.default,
-  ]);
+  }, [designSystemPatterns, loadDesignSystemPattern, sdk]);
+
+  const iframePreviewUrl = useMemo<string>(() => {
+    if (designSystemPattern === null || designSystemPattern === undefined) {
+      return '';
+    }
+
+    return (
+      getEntryFieldValue(
+        designSystemPattern.fields.iframePreviewUrl,
+        designSystemPattern.sys.locale || sdk.locales.default,
+      ) || ''
+    );
+  }, [designSystemPattern, sdk.locales.default]);
+  const isStorybookIframe = useMemo(() => {
+    return iframePreviewUrl.includes('&viewMode=story');
+  }, [iframePreviewUrl]);
 
   return (
-    <div className={styles.designSystem}>
-      <div className={styles.container}>
-        {designSystemPattern === undefined ? (
-          <>
-            <SkeletonContainer>
-              <SkeletonBodyText numberOfLines={4} />
-            </SkeletonContainer>
-          </>
-        ) : designSystemPattern === null ? (
+    <>
+      {designSystemPattern === undefined ? (
+        <div className={styles.container}>
+          <SkeletonContainer>
+            <SkeletonBodyText numberOfLines={4} />
+          </SkeletonContainer>
+        </div>
+      ) : designSystemPattern === null ? (
+        <div className={styles.container}>
           <EmptyState
             headingProps={{ text: 'Design System not available' }}
             descriptionProps={{
@@ -255,51 +194,104 @@ const EntryEditor: React.FC<ConfigProps> = (props) => {
                 'Failed to load the design system documentation for this content type.',
             }}
           />
-        ) : (
-          <>
-            <p>
-              Last updated on:{' '}
-              {new Date(designSystemPattern.sys.updatedAt).toLocaleDateString()}
-            </p>
-            <h2>
-              {getEntryFieldValue(
-                designSystemPattern.fields.name,
-                designSystemPattern.sys.locale || sdk.locales.default,
-              )}
-            </h2>
-            {getEntryFieldValue(
-              designSystemPattern.fields.iframePreviewUrl,
-              designSystemPattern.sys.locale || sdk.locales.default,
-            ) ? (
-              <div className={styles.iframeContainer}>
-                <iframe
-                  title="Preview"
-                  src={getEntryFieldValue(
-                    designSystemPattern.fields.iframePreviewUrl,
-                    designSystemPattern.sys.locale || sdk.locales.default,
-                  )}
-                />
-              </div>
-            ) : null}
-            <p>
-              {getEntryFieldValue(
-                designSystemPattern.fields.description,
-                designSystemPattern.sys.locale || sdk.locales.default,
-              )}
-            </p>
-            <div className={styles.richText}>
-              {documentToReactComponents(
-                getEntryFieldValue(
-                  designSystemPattern.fields.contentGuidelines,
+        </div>
+      ) : (
+        <>
+          <div className={styles.container}>
+            <Typography>
+              <Paragraph>
+                Last updated on:{' '}
+                {new Date(
+                  designSystemPattern.sys.updatedAt,
+                ).toLocaleDateString()}
+              </Paragraph>
+
+              <Heading>
+                {getEntryFieldValue(
+                  designSystemPattern.fields.name,
                   designSystemPattern.sys.locale || sdk.locales.default,
-                ),
-                richTextOptions,
-              )}
+                )}
+              </Heading>
+            </Typography>
+          </div>
+          {getEntryFieldValue(
+            designSystemPattern.fields.iframePreviewUrl,
+            designSystemPattern.sys.locale || sdk.locales.default,
+          ) ? (
+            <>
+              <div className={styles.previewIntro}>
+                <Subheading>Example preview:</Subheading>
+                <div>
+                  <Button
+                    onClick={() => {
+                      window.open(
+                        getEntryFieldValue(
+                          designSystemPattern.fields.iframePreviewUrl,
+                          designSystemPattern.sys.locale || sdk.locales.default,
+                        ),
+                      );
+                    }}
+                    buttonType="naked"
+                    size="small"
+                    icon="ExternalLink"
+                  >
+                    Open in a new window
+                  </Button>
+                  {isStorybookIframe ? (
+                    <Button
+                      onClick={() => {
+                        window.open(
+                          getEntryFieldValue(
+                            designSystemPattern.fields.iframePreviewUrl,
+                            designSystemPattern.sys.locale ||
+                              sdk.locales.default,
+                          ),
+                        );
+                      }}
+                      buttonType="naked"
+                      size="small"
+                      icon="ExternalLink"
+                    >
+                      Open full documentation
+                    </Button>
+                  ) : null}
+                </div>
+              </div>
+              <div className={styles.containerPreview}>
+                <div className={styles.iframeContainer}>
+                  <iframe
+                    title="Preview"
+                    src={getEntryFieldValue(
+                      designSystemPattern.fields.iframePreviewUrl,
+                      designSystemPattern.sys.locale || sdk.locales.default,
+                    )}
+                  />
+                </div>
+              </div>
+            </>
+          ) : null}
+          <div className={styles.designSystem}>
+            <div className={styles.container}>
+              <p>
+                {getEntryFieldValue(
+                  designSystemPattern.fields.description,
+                  designSystemPattern.sys.locale || sdk.locales.default,
+                )}
+              </p>
+              <div className={styles.richText}>
+                {documentToReactComponents(
+                  getEntryFieldValue(
+                    designSystemPattern.fields.contentGuidelines,
+                    designSystemPattern.sys.locale || sdk.locales.default,
+                  ),
+                  richTextOptions,
+                )}
+              </div>
             </div>
-          </>
-        )}
-      </div>
-    </div>
+          </div>
+        </>
+      )}
+    </>
   );
 };
 
