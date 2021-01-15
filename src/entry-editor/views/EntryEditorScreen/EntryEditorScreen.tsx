@@ -1,12 +1,6 @@
 import { Entry } from 'contentful';
 import { EditorExtensionSDK } from 'contentful-ui-extensions-sdk';
-import React, {
-  useState,
-  useEffect,
-  useMemo,
-  useCallback,
-  useRef,
-} from 'react';
+import React, { useState, useEffect, useMemo, useCallback } from 'react';
 
 import {
   SkeletonContainer,
