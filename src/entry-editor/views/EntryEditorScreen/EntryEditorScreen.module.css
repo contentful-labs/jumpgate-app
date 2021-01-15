@@ -34,6 +34,10 @@
   position: relative;
 }
 
+.iframeContainerWithHeight {
+  padding-bottom: 0;
+}
+
 .iframeContainer iframe {
   border: 2px dashed var(--color-ice-dark);
   height: 100%;
@@ -41,6 +45,11 @@
   position: absolute;
   top: 0;
   width: 100%;
+}
+
+.designSystem figcaption {
+  font-style: italic;
+  margin-left: 1em;
 }
 
 /*!

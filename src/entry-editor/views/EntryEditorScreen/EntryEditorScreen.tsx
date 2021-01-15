@@ -1,6 +1,12 @@
 import { Entry } from 'contentful';
 import { EditorExtensionSDK } from 'contentful-ui-extensions-sdk';
-import React, { useState, useEffect, useMemo, useCallback } from 'react';
+import React, {
+  useState,
+  useEffect,
+  useMemo,
+  useCallback,
+  useRef,
+} from 'react';
 
 import {
   SkeletonContainer,
@@ -161,6 +167,7 @@ const EntryEditor: React.FC<ConfigProps> = (props) => {
     return options;
   }, [designSystemPatterns, loadDesignSystemPattern, sdk]);
 
+  const [iframeHeight, setIframeHeight] = useState<number>();
   const iframePreviewUrl = useMemo<string>(() => {
     if (designSystemPattern === null || designSystemPattern === undefined) {
       return '';
@@ -176,6 +183,27 @@ const EntryEditor: React.FC<ConfigProps> = (props) => {
   const isStorybookIframe = useMemo(() => {
     return iframePreviewUrl.includes('&viewMode=story');
   }, [iframePreviewUrl]);
+
+  useEffect(() => {
+    const onIframeMessage = (e: MessageEvent) => {
+      try {
+        const data = JSON.parse(e.data);
+
+        if (typeof data.design_system_app_preview_content_height !== 'number') {
+          return;
+        }
+
+        setIframeHeight(data.design_system_app_preview_content_height);
+      } catch {}
+    };
+
+    window.addEventListener('message', onIframeMessage);
+
+    return () => {
+      window.removeEventListener('message', onIframeMessage);
+      setIframeHeight(undefined);
+    };
+  }, []);
 
   return (
     <>
@@ -199,13 +227,6 @@ const EntryEditor: React.FC<ConfigProps> = (props) => {
         <>
           <div className={styles.container}>
             <Typography>
-              <Paragraph>
-                Last updated on:{' '}
-                {new Date(
-                  designSystemPattern.sys.updatedAt,
-                ).toLocaleDateString()}
-              </Paragraph>
-
               <Heading>
                 {getEntryFieldValue(
                   designSystemPattern.fields.name,
@@ -213,23 +234,23 @@ const EntryEditor: React.FC<ConfigProps> = (props) => {
                 )}
               </Heading>
             </Typography>
+            <div className={styles.designSystem}>
+              <p>
+                {getEntryFieldValue(
+                  designSystemPattern.fields.description,
+                  designSystemPattern.sys.locale || sdk.locales.default,
+                )}
+              </p>
+            </div>
           </div>
-          {getEntryFieldValue(
-            designSystemPattern.fields.iframePreviewUrl,
-            designSystemPattern.sys.locale || sdk.locales.default,
-          ) ? (
+          {iframePreviewUrl ? (
             <>
               <div className={styles.previewIntro}>
                 <Subheading>Example preview:</Subheading>
                 <div>
                   <Button
                     onClick={() => {
-                      window.open(
-                        getEntryFieldValue(
-                          designSystemPattern.fields.iframePreviewUrl,
-                          designSystemPattern.sys.locale || sdk.locales.default,
-                        ),
-                      );
+                      window.open(iframePreviewUrl);
                     }}
                     buttonType="naked"
                     size="small"
@@ -241,11 +262,9 @@ const EntryEditor: React.FC<ConfigProps> = (props) => {
                     <Button
                       onClick={() => {
                         window.open(
-                          getEntryFieldValue(
-                            designSystemPattern.fields.iframePreviewUrl,
-                            designSystemPattern.sys.locale ||
-                              sdk.locales.default,
-                          ),
+                          iframePreviewUrl
+                            .split('?')[0]
+                            .replace('iframe.html', ''),
                         );
                       }}
                       buttonType="naked"
@@ -258,7 +277,16 @@ const EntryEditor: React.FC<ConfigProps> = (props) => {
                 </div>
               </div>
               <div className={styles.containerPreview}>
-                <div className={styles.iframeContainer}>
+                <div
+                  className={`${styles.iframeContainer} ${
+                    iframeHeight === undefined
+                      ? ''
+                      : styles.iframeContainerWithHeight
+                  }`}
+                  style={{
+                    height: iframeHeight ? iframeHeight + 20 : undefined,
+                  }}
+                >
                   <iframe
                     title="Preview"
                     src={getEntryFieldValue(
@@ -272,12 +300,6 @@ const EntryEditor: React.FC<ConfigProps> = (props) => {
           ) : null}
           <div className={styles.designSystem}>
             <div className={styles.container}>
-              <p>
-                {getEntryFieldValue(
-                  designSystemPattern.fields.description,
-                  designSystemPattern.sys.locale || sdk.locales.default,
-                )}
-              </p>
               <div className={styles.richText}>
                 {documentToReactComponents(
                   getEntryFieldValue(
@@ -288,6 +310,13 @@ const EntryEditor: React.FC<ConfigProps> = (props) => {
                 )}
               </div>
             </div>
+          </div>
+
+          <div className={styles.container}>
+            <Paragraph>
+              Last updated on:{' '}
+              {new Date(designSystemPattern.sys.updatedAt).toLocaleDateString()}
+            </Paragraph>
           </div>
         </>
       )}
