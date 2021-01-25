@@ -52,6 +52,16 @@
   margin-left: 1em;
 }
 
+.designSystem code {
+  background-color: var(--color-element-light);
+  border-radius: 4px;
+  display: block;
+  overflow-x: scroll;
+  padding: var(--spacing-m);
+  white-space: pre;
+  -webkit-overflow-scrolling: touch;
+}
+
 /*!
  * awsm.css v3.0.7 (https://igoradamenko.github.io/awsm.css/)
  * Copyright 2015 Igor Adamenko <mail@igoradamenko.com> (https://igoradamenko.com)
