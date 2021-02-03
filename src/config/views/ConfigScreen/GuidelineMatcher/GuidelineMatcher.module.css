@@ -1,0 +1,23 @@
+.contentTypeLabel {
+  font-weight: 500;
+  margin-top: 8px;
+}
+
+.helpText {
+  align-items: center;
+  display: flex;
+  margin-top: var(--spacing-s);
+}
+
+.helpTextIcon {
+  margin-right: var(--spacing-2xs);
+}
+
+.tableHeadCell {
+  align-items: center;
+  display: inline-flex;
+}
+
+.tableHeadCellIcon {
+  margin-left: var(--spacing-2xs);
+}

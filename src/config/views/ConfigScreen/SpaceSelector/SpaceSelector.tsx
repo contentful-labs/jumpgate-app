@@ -34,12 +34,13 @@ const SpaceSelector: React.FC<SpaceSelectorProps> = (props) => {
     <Form className={styles.container}>
       <Typography>
         <Subheading className={styles.heading}>
-          Design System Source - source space
+          Connect a source space
         </Subheading>
         <Paragraph>
-          You need to provide a Space ID and a matching Delivery API Token of a
-          space where your Design System is defined. This app needs to be
-          installed in that space as well.
+          To set up the Jumpgate app, please provide the Space ID and Content
+          Delivery API (CDA) token from your space below. Once the connection
+          with the source space is set up, you will be able to map the content
+          guidelines you created to content types in this space.
         </Paragraph>
       </Typography>
       <TextField

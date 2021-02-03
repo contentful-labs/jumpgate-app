@@ -1,4 +1,4 @@
-Design System App exploration - Work in progress
+Jumpgate app
 
 This project was bootstrapped with [Create Contentful App](https://github.com/contentful/create-contentful-app).
 

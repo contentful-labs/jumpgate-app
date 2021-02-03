@@ -1,6 +1,6 @@
 import { Entry } from 'contentful';
 import { AppExtensionSDK, ContentType } from 'contentful-ui-extensions-sdk';
-import React, { useEffect, useMemo } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 
 import {
   SkeletonContainer,
@@ -16,35 +16,33 @@ import {
   TableRow,
   TableBody,
   TableCell,
+  HelpText,
+  Icon,
+  Tooltip,
 } from '@contentful/forma-36-react-components';
 
 import { SOURCE_CONTENT_TYPE_ID } from '../../../../constants';
-import {
-  AppInstallationParameters,
-  DesignSystemPatternFields,
-} from '../../../../types';
+import { AppInstallationParameters, GuidelineFields } from '../../../../types';
 import getEntryFieldValue from '../../../../utils/getEntryFieldValue';
-import styles from './DesignSystemPatternMatcher.module.css';
+import styles from './GuidelineMatcher.module.css';
 
-interface DesignSystemPatternMatcherProps {
+interface GuidelineMatcherProps {
   sdk: AppExtensionSDK;
   appInstallationParameters: AppInstallationParameters;
   setAppInstallationParameters: React.Dispatch<
     React.SetStateAction<AppInstallationParameters | null>
   >;
   contentTypes: ContentType[] | null;
-  sourceDesignSystemPatterns: Entry<DesignSystemPatternFields>[] | null;
+  sourceGuidelines: Entry<GuidelineFields>[] | null;
 }
 
-const DesignSystemPatternMatcher: React.FC<DesignSystemPatternMatcherProps> = (
-  props,
-) => {
+const GuidelineMatcher: React.FC<GuidelineMatcherProps> = (props) => {
   const {
     sdk,
     appInstallationParameters,
     setAppInstallationParameters,
     contentTypes,
-    sourceDesignSystemPatterns,
+    sourceGuidelines,
   } = props;
 
   const filteredContentTypes = useMemo(() => {
@@ -66,7 +64,7 @@ const DesignSystemPatternMatcher: React.FC<DesignSystemPatternMatcherProps> = (
     }
 
     return (
-      sourceDesignSystemPatterns?.find((designSystemPattern) => {
+      sourceGuidelines?.find((designSystemPattern) => {
         const name = getEntryFieldValue(
           designSystemPattern.fields.name,
           designSystemPattern.sys.locale || sdk.locales.default,
@@ -79,11 +77,14 @@ const DesignSystemPatternMatcher: React.FC<DesignSystemPatternMatcherProps> = (
     );
   };
 
+  // A list of matches that we auto-suggested based the naming
+  const [suggestedMatches, setSuggestedMatches] = useState<string[]>([]);
+
   // Populate defaults
   useEffect(() => {
     if (
-      sourceDesignSystemPatterns === null ||
-      sourceDesignSystemPatterns.length === null ||
+      sourceGuidelines === null ||
+      sourceGuidelines.length === null ||
       filteredContentTypes.length === 0
     ) {
       return;
@@ -99,7 +100,7 @@ const DesignSystemPatternMatcher: React.FC<DesignSystemPatternMatcherProps> = (
         return;
       }
 
-      const nameMatchingDesignSystemPattern = sourceDesignSystemPatterns?.find(
+      const nameMatchingGuideline = sourceGuidelines?.find(
         (designSystemPattern) => {
           const name = getEntryFieldValue(
             designSystemPattern.fields.name,
@@ -112,11 +113,12 @@ const DesignSystemPatternMatcher: React.FC<DesignSystemPatternMatcherProps> = (
         },
       )?.sys.id;
 
-      if (nameMatchingDesignSystemPattern === undefined) {
+      if (nameMatchingGuideline === undefined) {
         return;
       }
 
-      newPatternMatches[contentType.sys.id] = nameMatchingDesignSystemPattern;
+      newPatternMatches[contentType.sys.id] = nameMatchingGuideline;
+      setSuggestedMatches((x) => [...x, contentType.sys.id]);
     });
 
     if (Object.keys(newPatternMatches).length > 0) {
@@ -133,7 +135,7 @@ const DesignSystemPatternMatcher: React.FC<DesignSystemPatternMatcherProps> = (
     filteredContentTypes,
     sdk.locales.default,
     setAppInstallationParameters,
-    sourceDesignSystemPatterns,
+    sourceGuidelines,
   ]);
 
   if (
@@ -143,31 +145,57 @@ const DesignSystemPatternMatcher: React.FC<DesignSystemPatternMatcherProps> = (
     return null;
   }
 
-  return sourceDesignSystemPatterns === null || contentTypes === null ? (
+  return sourceGuidelines === null || contentTypes === null ? (
     <SkeletonContainer>
       <SkeletonBodyText numberOfLines={4} />
     </SkeletonContainer>
-  ) : sourceDesignSystemPatterns.length === 0 ? (
+  ) : sourceGuidelines.length === 0 ? (
     <EmptyState
-      headingProps={{ text: 'No Design System Patterns (yet!)' }}
+      headingProps={{ text: 'Nothing to see here (yet!)' }}
       descriptionProps={{
         text:
-          "It looks like your Design System Source space has no published patterns. Don't worry, as soon as some get published, you can come back here and assign them to your content types.",
+          'Once you publish some guidelines in the source space, they will show up here allowing you to assign them to the content types in the target space.',
       }}
     />
   ) : (
     <Typography>
       <Paragraph>
-        Below is a list of Content Types found in this space. You can assign a
-        Design System pattern to each, and that pattern documentation will be
-        shown in the editor tab when editing an entry of that content type.
+        The form below allows you to assign the guidelines / resources / info
+        text from the source space to a specific content type within this space.
+        Once assigned, the guidelines will be displayed for all the entries of
+        the chosen type, under the Jumpgate tab in the entry editor view.
       </Paragraph>
       <Form>
         <Table>
           <TableHead isSticky>
             <TableRow>
-              <TableCell>Content Type</TableCell>
-              <TableCell>Design System Pattern</TableCell>
+              <TableCell>
+                <Tooltip content="Content types of this space" usePortal>
+                  <div className={styles.tableHeadCell}>
+                    Content Type{' '}
+                    <Icon
+                      icon="HelpCircle"
+                      className={styles.tableHeadCellIcon}
+                      color="muted"
+                    />
+                  </div>
+                </Tooltip>
+              </TableCell>
+              <TableCell>
+                <Tooltip
+                  content="Guidelines defined in the source space"
+                  usePortal
+                >
+                  <div className={styles.tableHeadCell}>
+                    Guideline{' '}
+                    <Icon
+                      icon="HelpCircle"
+                      className={styles.tableHeadCellIcon}
+                      color="muted"
+                    />
+                  </div>
+                </Tooltip>
+              </TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
@@ -193,9 +221,8 @@ const DesignSystemPatternMatcher: React.FC<DesignSystemPatternMatcherProps> = (
                       });
                     }}
                   >
-                    {/* SOLVE onChange not firing for default values */}
-                    <Option value="">N/A - No assignment</Option>
-                    {sourceDesignSystemPatterns.map((designSystemPattern) => (
+                    <Option value="">No selection</Option>
+                    {sourceGuidelines.map((designSystemPattern) => (
                       <Option
                         key={designSystemPattern.sys.id}
                         value={designSystemPattern.sys.id}
@@ -207,6 +234,16 @@ const DesignSystemPatternMatcher: React.FC<DesignSystemPatternMatcherProps> = (
                       </Option>
                     ))}
                   </Select>
+                  {suggestedMatches.includes(contentType.sys.id) === true ? (
+                    <HelpText className={styles.helpText}>
+                      <Icon
+                        icon="InfoCircle"
+                        color="muted"
+                        className={styles.helpTextIcon}
+                      />{' '}
+                      Suggested automatically based on a matching name
+                    </HelpText>
+                  ) : null}
                 </TableCell>
               </TableRow>
             ))}
@@ -217,4 +254,4 @@ const DesignSystemPatternMatcher: React.FC<DesignSystemPatternMatcherProps> = (
   );
 };
 
-export default DesignSystemPatternMatcher;
+export default GuidelineMatcher;

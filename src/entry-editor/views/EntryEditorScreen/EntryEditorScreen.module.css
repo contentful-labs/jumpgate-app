@@ -1,22 +1,125 @@
+@font-face {
+  font-family: 'Archivo';
+  src: url('../../fonts/Archivo-Regular.woff2') format('woff2'),
+    url('../../fonts/Archivo-Regular.woff') format('woff');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Archivo';
+  src: url('../../fonts/Archivo-SemiBold.woff2') format('woff2'),
+    url('../../fonts/Archivo-SemiBold.woff') format('woff');
+  font-weight: 600;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Archivo';
+  src: url('../../fonts/Archivo-SemiBoldItalic.woff2') format('woff2'),
+    url('../../fonts/Archivo-SemiBoldItalic.woff') format('woff');
+  font-weight: 600;
+  font-style: italic;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Archivo';
+  src: url('../../fonts/Archivo-Italic.woff2') format('woff2'),
+    url('../../fonts/Archivo-Italic.woff') format('woff');
+  font-weight: normal;
+  font-style: italic;
+  font-display: swap;
+}
+
+.entryEditor {
+  color: #5c6879;
+  font-family: 'Archivo', -apple-system, BlinkMacSystemFont, Segoe UI, Helvetica,
+    Arial, sans-serif, Apple Color Emoji, Segoe UI Emoji, Segoe UI Symbol;
+  font-size: 1.125rem;
+  line-height: 1.4;
+}
+
+.entryEditor *,
+.entryEditor *::before,
+.entryEditor *::after {
+  box-sizing: border-box;
+}
+
+.entryEditorTop {
+  background-color: #fafbfb;
+  box-shadow: 0px 3px 6px #00000029;
+  margin-bottom: 30px;
+  padding-bottom: 60px;
+  padding-top: 20px;
+}
+
+.mainHeading {
+  color: #0c2845;
+  font-size: 50px;
+  font-weight: 600;
+  margin: 1rem 0;
+}
+
+.shortDescription {
+  color: var(--color-text-mid);
+}
+
 .container {
   height: auto;
-  margin: 2rem auto 0;
-  max-width: 768px;
+  margin: 0 auto;
+  max-width: calc(880px + 6rem);
   padding: 2rem 3rem;
 }
 
 .previewIntro {
-  align-items: baseline;
+  align-items: center;
   display: flex;
   justify-content: space-between;
   margin: 0 auto;
-  max-width: 768px;
+  max-width: calc(880px + 6rem);
   padding: 0 3rem;
+}
+
+.previewIntroHeading {
+  color: #0c2845;
+  font-size: inherit;
+  font-weight: 400;
+  margin: 0;
+}
+
+.previewButton {
+  align-items: center;
+  appearance: none;
+  background-color: #fff;
+  border: 1px solid #cad5e5;
+  border-radius: 9px;
+  cursor: pointer;
+  box-shadow: none;
+  display: inline-flex;
+  font-family: inherit;
+  font-size: inherit;
+  margin-left: 20px;
+  padding: 14px 18px;
+}
+
+.previewButton:hover,
+.previewButton:focus {
+  box-shadow: var(--box-shadow-default);
+}
+
+.previewButtonIcon {
+  fill: #0c2845;
+  height: 22px;
+  margin-right: 10px;
+  width: 22px;
 }
 
 .containerPreview {
   height: auto;
-  margin: 0 auto;
+  margin: 1.5rem auto 0;
   max-width: 1200px;
   padding: 1rem 3rem;
 }
@@ -39,12 +142,24 @@
 }
 
 .iframeContainer iframe {
-  border: 2px dashed var(--color-ice-dark);
+  border: 0;
+  box-shadow: var(--box-shadow-default);
   height: 100%;
   left: 0;
   position: absolute;
   top: 0;
   width: 100%;
+}
+
+.entryEditorContent {
+  background-color: #fff;
+  box-shadow: 0px 3px 6px #00000029;
+  padding-bottom: 30px;
+}
+
+.entryEditorFooter {
+  font-size: 16px;
+  text-align: right;
 }
 
 .designSystem figcaption {
@@ -67,9 +182,10 @@
  * Copyright 2015 Igor Adamenko <mail@igoradamenko.com> (https://igoradamenko.com)
  * Licensed under MIT (https://github.com/igoradamenko/awsm.css/blob/master/LICENSE.md)
  */
-.designSystem {
-  font-family: var(--font-stack-primary);
-  line-height: 1.4;
+
+.designSystem strong,
+.designSystem b {
+  font-weight: 600;
 }
 
 .designSystem h1:not(:last-child),
@@ -192,6 +308,8 @@
 .designSystem h4,
 .designSystem h5,
 .designSystem h6 {
+  color: #0c2845;
+  font-weight: 600;
   margin: 1.3em 0 0;
   line-height: 1.2;
 }
@@ -287,16 +405,16 @@
   content: '§ ';
 }
 .designSystem h1 {
-  font-size: 2.5em;
+  font-size: 3em;
 }
 .designSystem h2 {
-  font-size: 1.75em;
+  font-size: 2.2em;
 }
 .designSystem h3 {
-  font-size: 1.25em;
+  font-size: 1.5em;
 }
 .designSystem h4 {
-  font-size: 1.15em;
+  font-size: 1.3em;
 }
 .designSystem a abbr,
 .designSystem h5,
@@ -354,7 +472,7 @@
 .designSystem picture {
   display: block;
   max-width: 100%;
-  margin: 0 auto;
+  margin: 0;
 }
 .designSystem audio,
 .designSystem video {

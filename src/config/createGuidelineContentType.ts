@@ -2,7 +2,7 @@ import { AppExtensionSDK } from 'contentful-ui-extensions-sdk';
 
 import { SOURCE_CONTENT_TYPE_ID, SOURCE_CONTENT_TYPE_NAME } from '../constants';
 
-interface CreateDesignSystemPatternContentTypeInputInterface {
+interface CreateGuidelineContentTypeInputInterface {
   sdk: AppExtensionSDK;
 }
 
@@ -26,7 +26,7 @@ const contentType = {
     },
     {
       id: 'description',
-      name: 'Description',
+      name: 'Short description',
       required: false,
       type: 'Symbol',
       validations: [
@@ -36,8 +36,8 @@ const contentType = {
       ],
     },
     {
-      id: 'contentGuidelines',
-      name: 'Content guidelines',
+      id: 'content',
+      name: 'Content',
       required: false,
       type: 'RichText',
       validations: [
@@ -69,8 +69,8 @@ const contentType = {
       ],
     },
     {
-      id: 'iframePreviewUrl',
-      name: 'iframe preview URL',
+      id: 'externalReferenceUrl',
+      name: 'External reference (URL)',
       required: false,
       type: 'Symbol',
       validations: [
@@ -86,13 +86,13 @@ const contentType = {
   ],
 };
 
-const createDesignSystemPatternContentType = async ({
+const createGuidelineContentType = async ({
   sdk,
-}: CreateDesignSystemPatternContentTypeInputInterface): Promise<void> => {
+}: CreateGuidelineContentTypeInputInterface): Promise<void> => {
   const createdContentType = await sdk.space.createContentType(contentType);
 
   // Call the update to publish a content type
   await sdk.space.updateContentType(createdContentType);
 };
 
-export default createDesignSystemPatternContentType;
+export default createGuidelineContentType;

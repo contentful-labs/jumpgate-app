@@ -6,11 +6,8 @@ import {
   SkeletonContainer,
   SkeletonBodyText,
   EmptyState,
-  Subheading,
   Paragraph,
-  Heading,
-  Typography,
-  Button,
+  Icon,
 } from '@contentful/forma-36-react-components';
 import {
   documentToReactComponents,
@@ -19,13 +16,10 @@ import {
 import { BLOCKS } from '@contentful/rich-text-types';
 
 import {
-  getSourceDesignSystemPattern,
-  getExternalSourceDesignSystemPattern,
-} from '../../../config/getSourceDesignSystemPatterns';
-import {
-  AppInstallationParameters,
-  DesignSystemPatternFields,
-} from '../../../types';
+  getSourceGuideline,
+  getExternalSourceGuideline,
+} from '../../../config/getSourceGuidelines';
+import { AppInstallationParameters, GuidelineFields } from '../../../types';
 import getEntryFieldValue from '../../../utils/getEntryFieldValue';
 import LazyAsset from '../../components/LazyAsset';
 import styles from './EntryEditorScreen.module.css';
@@ -39,8 +33,8 @@ const EntryEditor: React.FC<ConfigProps> = (props) => {
   const installationParameters = sdk.parameters
     .installation as AppInstallationParameters;
 
-  const [designSystemPattern, setDesignSystemPattern] = useState<
-    Entry<DesignSystemPatternFields> | null | undefined
+  const [guideline, setGuideline] = useState<
+    Entry<GuidelineFields> | null | undefined
   >(undefined);
 
   useEffect(() => {
@@ -49,25 +43,25 @@ const EntryEditor: React.FC<ConfigProps> = (props) => {
         installationParameters.patternMatches[sdk.contentType.sys.id] ===
         undefined
       ) {
-        setDesignSystemPattern(null);
+        setGuideline(null);
         return;
       }
 
       if (installationParameters.spaceType === 'consumer') {
-        setDesignSystemPattern(
-          await getExternalSourceDesignSystemPattern(
+        setGuideline(
+          await getExternalSourceGuideline(
             installationParameters.sourceSpaceId!,
             installationParameters.sourceDeliveryToken!,
             installationParameters.patternMatches[sdk.contentType.sys.id],
           ),
         );
       } else if (installationParameters.spaceType === 'sourceandconsumer') {
-        const internalSystemPattern = await getSourceDesignSystemPattern(
+        const internalSystemPattern = await getSourceGuideline(
           sdk,
           installationParameters.patternMatches[sdk.contentType.sys.id],
         );
 
-        setDesignSystemPattern(internalSystemPattern);
+        setGuideline(internalSystemPattern);
       }
     })();
   }, [
@@ -79,43 +73,40 @@ const EntryEditor: React.FC<ConfigProps> = (props) => {
     sdk.contentType.sys.id,
   ]);
 
-  const [designSystemPatterns, setDesignSystemPatterns] = useState<
-    Record<string, Entry<DesignSystemPatternFields> | null | undefined>
+  const [guidelines, setGuidelines] = useState<
+    Record<string, Entry<GuidelineFields> | null | undefined>
   >({});
 
-  const loadDesignSystemPattern = useCallback(
+  const loadGuideline = useCallback(
     async (entryId: string): Promise<void> => {
-      setDesignSystemPatterns({
-        ...designSystemPatterns,
+      setGuidelines({
+        ...guidelines,
         [entryId]: null,
       });
 
-      let loadedDesignSystemPattern = null;
+      let loadedGuideline = null;
 
       if (installationParameters.spaceType === 'consumer') {
-        loadedDesignSystemPattern = await getExternalSourceDesignSystemPattern(
+        loadedGuideline = await getExternalSourceGuideline(
           installationParameters.sourceSpaceId!,
           installationParameters.sourceDeliveryToken!,
           entryId,
         );
       } else if (installationParameters.spaceType === 'sourceandconsumer') {
-        loadedDesignSystemPattern = await getSourceDesignSystemPattern(
-          sdk,
-          entryId,
-        );
+        loadedGuideline = await getSourceGuideline(sdk, entryId);
       }
 
-      if (loadedDesignSystemPattern === null) {
+      if (loadedGuideline === null) {
         return;
       }
 
-      setDesignSystemPatterns({
-        ...designSystemPatterns,
-        [entryId]: loadedDesignSystemPattern,
+      setGuidelines({
+        ...guidelines,
+        [entryId]: loadedGuideline,
       });
     },
     [
-      designSystemPatterns,
+      guidelines,
       installationParameters.sourceDeliveryToken,
       installationParameters.sourceSpaceId,
       installationParameters.spaceType,
@@ -132,14 +123,14 @@ const EntryEditor: React.FC<ConfigProps> = (props) => {
         },
         [BLOCKS.EMBEDDED_ENTRY]: (node) => {
           const entryId = node.data.target.sys.id;
-          const designSystemPattern = designSystemPatterns[entryId];
+          const guideline = guidelines[entryId];
 
-          if (designSystemPattern === undefined) {
-            loadDesignSystemPattern(entryId);
+          if (guideline === undefined) {
+            loadGuideline(entryId);
             return null;
           }
 
-          if (designSystemPattern === null) {
+          if (guideline === null) {
             return null;
           }
 
@@ -147,8 +138,8 @@ const EntryEditor: React.FC<ConfigProps> = (props) => {
             <div className={styles.richText}>
               {documentToReactComponents(
                 getEntryFieldValue(
-                  designSystemPattern.fields.contentGuidelines,
-                  designSystemPattern.sys.locale || sdk.locales.default,
+                  guideline.fields.content,
+                  guideline.sys.locale || sdk.locales.default,
                 ),
                 richTextOptions,
               )}
@@ -159,21 +150,21 @@ const EntryEditor: React.FC<ConfigProps> = (props) => {
     };
 
     return options;
-  }, [designSystemPatterns, loadDesignSystemPattern, sdk]);
+  }, [guidelines, loadGuideline, sdk]);
 
   const [iframeHeight, setIframeHeight] = useState<number>();
   const iframePreviewUrl = useMemo<string>(() => {
-    if (designSystemPattern === null || designSystemPattern === undefined) {
+    if (guideline === null || guideline === undefined) {
       return '';
     }
 
     return (
       getEntryFieldValue(
-        designSystemPattern.fields.iframePreviewUrl,
-        designSystemPattern.sys.locale || sdk.locales.default,
+        guideline.fields.externalReferenceUrl,
+        guideline.sys.locale || sdk.locales.default,
       ) || ''
     );
-  }, [designSystemPattern, sdk.locales.default]);
+  }, [guideline, sdk.locales.default]);
   const isStorybookIframe = useMemo(() => {
     return iframePreviewUrl.includes('&viewMode=story');
   }, [iframePreviewUrl]);
@@ -200,14 +191,14 @@ const EntryEditor: React.FC<ConfigProps> = (props) => {
   }, []);
 
   return (
-    <>
-      {designSystemPattern === undefined ? (
+    <div className={styles.entryEditor}>
+      {guideline === undefined ? (
         <div className={styles.container}>
           <SkeletonContainer>
             <SkeletonBodyText numberOfLines={4} />
           </SkeletonContainer>
         </div>
-      ) : designSystemPattern === null ? (
+      ) : guideline === null ? (
         <div className={styles.container}>
           <EmptyState
             headingProps={{ text: 'Design System not available' }}
@@ -218,103 +209,110 @@ const EntryEditor: React.FC<ConfigProps> = (props) => {
           />
         </div>
       ) : (
-        <>
-          <div className={styles.container}>
-            <Typography>
-              <Heading>
+        <main>
+          <div className={styles.entryEditorTop}>
+            <div className={styles.container}>
+              <h1 className={styles.mainHeading}>
                 {getEntryFieldValue(
-                  designSystemPattern.fields.name,
-                  designSystemPattern.sys.locale || sdk.locales.default,
+                  guideline.fields.name,
+                  guideline.sys.locale || sdk.locales.default,
                 )}
-              </Heading>
-            </Typography>
-            <div className={styles.designSystem}>
-              <p>
+              </h1>
+              <p className={styles.shortDescription}>
                 {getEntryFieldValue(
-                  designSystemPattern.fields.description,
-                  designSystemPattern.sys.locale || sdk.locales.default,
+                  guideline.fields.description,
+                  guideline.sys.locale || sdk.locales.default,
                 )}
               </p>
             </div>
-          </div>
-          {iframePreviewUrl ? (
-            <>
-              <div className={styles.previewIntro}>
-                <Subheading>Example preview:</Subheading>
-                <div>
-                  <Button
-                    onClick={() => {
-                      window.open(iframePreviewUrl);
-                    }}
-                    buttonType="naked"
-                    size="small"
-                    icon="ExternalLink"
-                  >
-                    Open in a new window
-                  </Button>
-                  {isStorybookIframe ? (
-                    <Button
+            {iframePreviewUrl ? (
+              <>
+                <div className={styles.previewIntro}>
+                  <h2 className={styles.previewIntroHeading}>
+                    Example preview:
+                  </h2>
+                  <div>
+                    <button
+                      className={styles.previewButton}
                       onClick={() => {
-                        window.open(
-                          iframePreviewUrl
-                            .split('?')[0]
-                            .replace('iframe.html', ''),
-                        );
+                        window.open(iframePreviewUrl);
                       }}
-                      buttonType="naked"
-                      size="small"
-                      icon="ExternalLink"
                     >
-                      Open full documentation
-                    </Button>
-                  ) : null}
+                      <Icon
+                        icon="ExternalLink"
+                        className={styles.previewButtonIcon}
+                      />
+                      Open in a new window
+                    </button>
+                    {isStorybookIframe ? (
+                      <button
+                        className={styles.previewButton}
+                        onClick={() => {
+                          window.open(
+                            iframePreviewUrl
+                              .split('?')[0]
+                              .replace('iframe.html', ''),
+                          );
+                        }}
+                      >
+                        <Icon
+                          icon="ExternalLink"
+                          className={styles.previewButtonIcon}
+                        />
+                        Open full documentation
+                      </button>
+                    ) : null}
+                  </div>
                 </div>
-              </div>
-              <div className={styles.containerPreview}>
-                <div
-                  className={`${styles.iframeContainer} ${
-                    iframeHeight === undefined
-                      ? ''
-                      : styles.iframeContainerWithHeight
-                  }`}
-                  style={{
-                    height: iframeHeight ? iframeHeight + 20 : undefined,
-                  }}
-                >
-                  <iframe
-                    title="Preview"
-                    src={getEntryFieldValue(
-                      designSystemPattern.fields.iframePreviewUrl,
-                      designSystemPattern.sys.locale || sdk.locales.default,
-                    )}
-                  />
+                <div className={styles.containerPreview}>
+                  <div
+                    className={`${styles.iframeContainer} ${
+                      iframeHeight === undefined
+                        ? ''
+                        : styles.iframeContainerWithHeight
+                    }`}
+                    style={{
+                      height: iframeHeight ? iframeHeight + 20 : undefined,
+                    }}
+                  >
+                    <iframe
+                      title="Preview"
+                      src={getEntryFieldValue(
+                        guideline.fields.externalReferenceUrl,
+                        guideline.sys.locale || sdk.locales.default,
+                      )}
+                    />
+                  </div>
                 </div>
-              </div>
-            </>
-          ) : null}
-          <div className={styles.designSystem}>
-            <div className={styles.container}>
-              <div className={styles.richText}>
-                {documentToReactComponents(
-                  getEntryFieldValue(
-                    designSystemPattern.fields.contentGuidelines,
-                    designSystemPattern.sys.locale || sdk.locales.default,
-                  ),
-                  richTextOptions,
-                )}
+              </>
+            ) : null}
+          </div>
+          <div className={styles.entryEditorContent}>
+            <div className={styles.designSystem}>
+              <div className={styles.container}>
+                <div className={styles.richText}>
+                  {documentToReactComponents(
+                    getEntryFieldValue(
+                      guideline.fields.content,
+                      guideline.sys.locale || sdk.locales.default,
+                    ),
+                    richTextOptions,
+                  )}
+                </div>
               </div>
             </div>
           </div>
-
-          <div className={styles.container}>
-            <Paragraph>
-              Last updated on:{' '}
-              {new Date(designSystemPattern.sys.updatedAt).toLocaleDateString()}
-            </Paragraph>
-          </div>
-        </>
+          <footer className={styles.entryEditorFooter}>
+            <div className={styles.container}>
+              <p>
+                Last updated on:{' '}
+                {new Date(guideline.sys.updatedAt).toLocaleDateString()}
+              </p>
+            </div>
+          </footer>
+        </main>
       )}
-    </>
+    </div>
   );
 };
 
