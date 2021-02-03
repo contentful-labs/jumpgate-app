@@ -8,9 +8,9 @@ export interface AppInstallationParameters {
   patternMatches: Record<string, string>;
 }
 
-export interface DesignSystemPatternFields {
+export interface GuidelineFields {
   name: string;
   description: string;
-  contentGuidelines: RichTextContent;
-  iframePreviewUrl: string;
+  content: RichTextContent;
+  externalReferenceUrl: string;
 }

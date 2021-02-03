@@ -25,17 +25,17 @@ import {
   SOURCE_CONTENT_TYPE_ID,
   SOURCE_CONTENT_TYPE_NAME,
 } from '../../../constants';
+import { AppInstallationParameters, GuidelineFields } from '../../../types';
+import iconConsumerSpace from '../../assets/icon-consumer-space.svg';
+import iconSourceSpace from '../../assets/icon-source-space.svg';
+import logo from '../../assets/logo.png';
+import createGuidelineContentType from '../../createGuidelineContentType';
 import {
-  AppInstallationParameters,
-  DesignSystemPatternFields,
-} from '../../../types';
-import createDesignSystemPatternContentType from '../../createDesignSystemPatternContentType';
-import {
-  getSourceDesignSystemPatterns,
-  getExternalSourceDesignSystemPatterns,
-} from '../../getSourceDesignSystemPatterns';
+  getSourceGuidelines,
+  getExternalSourceGuidelines,
+} from '../../getSourceGuidelines';
 import styles from './ConfigScreen.module.css';
-import DesignSystemPatternMatcher from './DesignSystemPatternMatcher/DesignSystemPatternMatcher';
+import GuidelineMatcher from './GuidelineMatcher/GuidelineMatcher';
 import SpaceSelector from './SpaceSelector/SpaceSelector';
 
 interface ConfigProps {
@@ -55,7 +55,7 @@ const Config: React.FC<ConfigProps> = (props) => {
 
   // Tabs navigation
   const [activeTab, setActiveTab] = useState<
-    null | 'spaceType' | 'designSystemPatternMatching'
+    null | 'spaceType' | 'guidelineMatching'
   >(null);
 
   // Load and store content types for the current space
@@ -84,8 +84,8 @@ const Config: React.FC<ConfigProps> = (props) => {
   }, [contentTypes]);
 
   // Source space design system patterns (could be from this space, or another)
-  const [sourceDesignSystemPatterns, setSourceDesignSystemPatterns] = useState<
-    Entry<DesignSystemPatternFields>[] | null
+  const [sourceGuidelines, setSourceGuidelines] = useState<
+    Entry<GuidelineFields>[] | null
   >(null);
 
   // Installation parameters
@@ -117,13 +117,14 @@ const Config: React.FC<ConfigProps> = (props) => {
       setAppInstallationParameters(parameters);
 
       if (parameters.spaceType === 'sourceandconsumer') {
-        await getSourceDesignSystemPatterns(sdk).then(
-          setSourceDesignSystemPatterns,
-        );
+        await getSourceGuidelines(sdk).then(setSourceGuidelines);
       }
 
-      if (Object.keys(savedParameters).length > 0) {
-        setActiveTab('designSystemPatternMatching');
+      if (
+        Object.keys(savedParameters).length > 0 &&
+        parameters.spaceType !== 'source'
+      ) {
+        setActiveTab('guidelineMatching');
       } else {
         setActiveTab('spaceType');
       }
@@ -139,7 +140,7 @@ const Config: React.FC<ConfigProps> = (props) => {
       return;
     }
 
-    setSourceDesignSystemPatterns(null);
+    setSourceGuidelines(null);
 
     const newAppInstallationparameters = {
       ...appInstallationParameters,
@@ -150,7 +151,7 @@ const Config: React.FC<ConfigProps> = (props) => {
       newAppInstallationparameters.sourceConnectionValidated = false;
     } else if (spaceType === 'sourceandconsumer') {
       newAppInstallationparameters.sourceConnectionValidated = true;
-      getSourceDesignSystemPatterns(sdk).then(setSourceDesignSystemPatterns);
+      getSourceGuidelines(sdk).then(setSourceGuidelines);
     }
 
     setAppInstallationParameters(newAppInstallationparameters);
@@ -226,8 +227,8 @@ const Config: React.FC<ConfigProps> = (props) => {
         return;
       }
 
-      setSourceDesignSystemPatterns(
-        await getExternalSourceDesignSystemPatterns(
+      setSourceGuidelines(
+        await getExternalSourceGuidelines(
           appInstallationParameters.sourceSpaceId,
           appInstallationParameters.sourceDeliveryToken,
         ),
@@ -289,7 +290,7 @@ const Config: React.FC<ConfigProps> = (props) => {
         // This space is not a consumer, so we need to create a content type to
         // hold the design system patterns
         if (contentTypeExists === false) {
-          await createDesignSystemPatternContentType({ sdk });
+          await createGuidelineContentType({ sdk });
           await fetchCurrentSpaceContentTypes();
         }
       }
@@ -345,12 +346,12 @@ const Config: React.FC<ConfigProps> = (props) => {
       //         widgetNamespace: 'builtin',
       //       },
       //       {
-      //         fieldId: 'contentGuidelines',
+      //         fieldId: 'content',
       //         widgetId: 'richTextEditor',
       //         widgetNamespace: 'builtin',
       //       },
       //       {
-      //         fieldId: 'iframePreviewUrl',
+      //         fieldId: 'externalReferenceUrl',
       //         settings: {
       //           helpText:
       //             'This could be a Storybook or any other URL where your component preview is hosted',
@@ -434,201 +435,227 @@ const Config: React.FC<ConfigProps> = (props) => {
   }
 
   return (
-    <div className={styles.container}>
-      <div className={styles.headerMenu}>
-        <Tabs>
+    <>
+      <div className={styles.config}>
+        <div className={styles.container}>
+          <div className={styles.headerMenu}>
+            <Tabs>
+              {activeTab === 'spaceType' ? (
+                <Tab id="spaceType" selected className={styles.tabWithIcon}>
+                  Installation{' '}
+                  {initialSetupDone ? (
+                    <Icon color="positive" icon="CheckCircle" />
+                  ) : null}{' '}
+                </Tab>
+              ) : null}
+
+              {(appInstallationParameters.spaceType === 'consumer' ||
+                appInstallationParameters.spaceType === 'sourceandconsumer') &&
+              activeTab === 'guidelineMatching' ? (
+                <Tab
+                  id="spaceType"
+                  selected
+                  disabled={
+                    (appInstallationParameters.spaceType ===
+                      'sourceandconsumer' &&
+                      contentTypeExists === false) ||
+                    (appInstallationParameters.spaceType === 'consumer' &&
+                      appInstallationParameters.sourceConnectionValidated ===
+                        false)
+                  }
+                >
+                  Guidelines matching
+                </Tab>
+              ) : null}
+            </Tabs>
+            {activeTab !== 'spaceType' ? (
+              <IconButton
+                label="Settings"
+                iconProps={{ icon: 'Settings', color: 'positive' }}
+                onClick={() => {
+                  setActiveTab('spaceType');
+                }}
+              />
+            ) : null}
+          </div>
+
           {activeTab === 'spaceType' ? (
-            <Tab id="spaceType" selected className={styles.tabWithIcon}>
-              Initial Setup{' '}
-              {initialSetupDone ? (
-                <Icon color="positive" icon="CheckCircle" />
-              ) : null}{' '}
-            </Tab>
-          ) : null}
-
-          {(appInstallationParameters.spaceType === 'consumer' ||
-            appInstallationParameters.spaceType === 'sourceandconsumer') &&
-          activeTab === 'designSystemPatternMatching' ? (
-            <Tab
-              id="spaceType"
-              selected
-              disabled={
-                (appInstallationParameters.spaceType === 'sourceandconsumer' &&
-                  contentTypeExists === false) ||
-                (appInstallationParameters.spaceType === 'consumer' &&
-                  appInstallationParameters.sourceConnectionValidated === false)
-              }
-            >
-              Design System Pattern Matching
-            </Tab>
-          ) : null}
-        </Tabs>
-        {activeTab !== 'spaceType' ? (
-          <IconButton
-            label="Settings"
-            iconProps={{ icon: 'Settings', color: 'positive' }}
-            onClick={() => {
-              setActiveTab('spaceType');
-            }}
-          />
-        ) : null}
-      </div>
-
-      {activeTab === 'spaceType' ? (
-        <TabPanel id="spaceType" className={styles.tabContainer}>
-          <Form>
-            <Typography>
-              <Paragraph>
-                The <strong>Design System</strong> app does two things. You can
-                define design system patterns, and you can assign patterns to
-                content types in order to help editors understand them better.
-                You can do these things in separate spaces (we recommend having
-                a dedicated "Design System" space for better governance), or you
-                can do both in the same space.
-              </Paragraph>
-              <Subheading className={styles.spacePurposeTitle}>
-                What is the purpose of the app for this space?
-              </Subheading>
-            </Typography>
-
-            <div className={styles.spacePurposeGrid}>
-              <Card
-                selected={currentSpaceIsSource}
-                onClick={() => {
-                  currentSpaceIsSource
-                    ? appInstallationParameters.spaceType ===
-                      'sourceandconsumer'
-                      ? onSpaceTypeChange('consumer')
-                      : onSpaceTypeChange(null)
-                    : appInstallationParameters.spaceType === 'consumer'
-                    ? onSpaceTypeChange('sourceandconsumer')
-                    : onSpaceTypeChange('source');
-                }}
-              >
-                <div className={styles.spacePurposeItem}>
-                  <div
-                    className={`${styles.spacePurposeIcon} ${
-                      currentSpaceIsSource === true
-                        ? styles.spacePurposeIconSelected
-                        : ''
-                    }`}
-                  >
-                    {currentSpaceIsSource === true ? (
-                      <Icon color="primary" icon="Plus" />
-                    ) : null}
-                  </div>
+            <TabPanel id="spaceType" className={styles.tabContainer}>
+              <Form>
+                <Typography>
                   <Paragraph>
-                    <b>
-                      I will be defining design system patterns in this space
-                    </b>
+                    The Jumpgate app allows users to embed useful contextual
+                    information in the entry editor view. The app can be used to
+                    provide useful onboarding information, highlight SEO best
+                    practices, document available design components and much
+                    more. When installed in the source space, the app offers
+                    users a way to author the content displayed in other spaces.
                   </Paragraph>
-                </div>
-              </Card>
-              <Card
-                selected={currentSpaceIsConsumer}
-                onClick={() => {
-                  currentSpaceIsConsumer
-                    ? appInstallationParameters.spaceType ===
-                      'sourceandconsumer'
-                      ? onSpaceTypeChange('source')
-                      : onSpaceTypeChange(null)
-                    : appInstallationParameters.spaceType === 'source'
-                    ? onSpaceTypeChange('sourceandconsumer')
-                    : onSpaceTypeChange('consumer');
-                }}
-              >
-                <div className={styles.spacePurposeItem}>
-                  <div
-                    className={`${styles.spacePurposeIcon} ${
-                      currentSpaceIsConsumer === true
-                        ? styles.spacePurposeIconSelected
-                        : ''
-                    }`}
-                  >
-                    {currentSpaceIsConsumer === true ? (
-                      <Icon color="primary" icon="Plus" />
-                    ) : null}
-                  </div>
-                  <Paragraph>
-                    <b>
-                      I have content types in this space that I want to document
-                    </b>
-                  </Paragraph>
-                </div>
-              </Card>
-            </div>
-          </Form>
+                  <Subheading className={styles.spacePurposeTitle}>
+                    What is the purpose of the app for this space?
+                  </Subheading>
+                </Typography>
 
-          {currentSpaceIsSource ? (
-            <div className={styles.section}>
-              {contentTypes === null ? (
-                <SkeletonContainer>
-                  <SkeletonBodyText numberOfLines={2} />
-                </SkeletonContainer>
-              ) : (
-                <div>
-                  <Typography>
-                    <Subheading>Design System Source - content type</Subheading>
-                    <Paragraph>
-                      The app will generate a content type in this space that
-                      will serve as your Design System patterns source.
-                    </Paragraph>
-                  </Typography>
-                  {contentTypeExists === true ? (
-                    <Note noteType="positive">
-                      Design System Pattern content type is present in this
-                      space.
-                    </Note>
+                <div className={styles.spacePurposeGrid}>
+                  <div className={styles.spacePurposeGridItem}>
+                    <img
+                      src={iconSourceSpace}
+                      alt="Source space icon"
+                      className={styles.spacePurposeGridItemIcon}
+                    />
+                    <Card
+                      selected={currentSpaceIsSource}
+                      onClick={() => {
+                        currentSpaceIsSource
+                          ? appInstallationParameters.spaceType ===
+                            'sourceandconsumer'
+                            ? onSpaceTypeChange('consumer')
+                            : onSpaceTypeChange(null)
+                          : appInstallationParameters.spaceType === 'consumer'
+                          ? onSpaceTypeChange('sourceandconsumer')
+                          : onSpaceTypeChange('source');
+                      }}
+                      className={`${styles.spacePurposeCard} ${
+                        currentSpaceIsSource
+                          ? styles.spacePurposeCardSelected
+                          : ''
+                      }`}
+                    >
+                      <div className={styles.spacePurposeItem}>
+                        <div
+                          className={`${styles.spacePurposeIcon} ${
+                            currentSpaceIsSource === true
+                              ? styles.spacePurposeIconSelected
+                              : ''
+                          }`}
+                        >
+                          {currentSpaceIsSource === true ? (
+                            <Icon color="primary" icon="Plus" />
+                          ) : null}
+                        </div>
+                        <Paragraph>
+                          I will be defining guidelines in this space
+                        </Paragraph>
+                      </div>
+                    </Card>
+                  </div>
+                  <div className={styles.spacePurposeGridItem}>
+                    <img
+                      src={iconConsumerSpace}
+                      alt="Consumer space icon"
+                      className={styles.spacePurposeGridItemIcon}
+                    />
+                    <Card
+                      selected={currentSpaceIsConsumer}
+                      onClick={() => {
+                        currentSpaceIsConsumer
+                          ? appInstallationParameters.spaceType ===
+                            'sourceandconsumer'
+                            ? onSpaceTypeChange('source')
+                            : onSpaceTypeChange(null)
+                          : appInstallationParameters.spaceType === 'source'
+                          ? onSpaceTypeChange('sourceandconsumer')
+                          : onSpaceTypeChange('consumer');
+                      }}
+                      className={`${styles.spacePurposeCard} ${
+                        currentSpaceIsConsumer
+                          ? styles.spacePurposeCardSelected
+                          : ''
+                      }`}
+                    >
+                      <div className={styles.spacePurposeItem}>
+                        <div
+                          className={`${styles.spacePurposeIcon} ${
+                            currentSpaceIsConsumer === true
+                              ? styles.spacePurposeIconSelected
+                              : ''
+                          }`}
+                        >
+                          {currentSpaceIsConsumer === true ? (
+                            <Icon color="primary" icon="Plus" />
+                          ) : null}
+                        </div>
+                        <Paragraph>
+                          I will be documenting content types of this&nbsp;space
+                        </Paragraph>
+                      </div>
+                    </Card>
+                  </div>
+                </div>
+              </Form>
+
+              {currentSpaceIsSource ? (
+                <div className={styles.section}>
+                  {contentTypes === null ? (
+                    <SkeletonContainer>
+                      <SkeletonBodyText numberOfLines={2} />
+                    </SkeletonContainer>
                   ) : (
-                    <Note>
-                      Installing this app will automatically create a new
-                      content type in this space.
-                    </Note>
+                    <div>
+                      <Typography>
+                        <Subheading>Guideline - content type</Subheading>
+                        <Paragraph>
+                          The app will generate a content type in this space
+                          that will serve as your guidelines source.
+                        </Paragraph>
+                      </Typography>
+                      {contentTypeExists === true ? (
+                        <Note noteType="positive">
+                          Guideline content type is present in this space.
+                        </Note>
+                      ) : (
+                        <Note>
+                          Installing this app will automatically create a new
+                          content type in this space.
+                        </Note>
+                      )}
+                    </div>
                   )}
                 </div>
-              )}
-            </div>
+              ) : null}
+
+              {appInstallationParameters.spaceType === 'consumer' ? (
+                <SpaceSelector
+                  sdk={sdk}
+                  appInstallationParameters={appInstallationParameters}
+                  setAppInstallationParameters={setAppInstallationParameters}
+                  onVerify={onVerify}
+                />
+              ) : null}
+
+              {initialSetupDone === true &&
+              appInstallationParameters.spaceType !== 'source' ? (
+                <div className={styles.goToGuidelineMatching}>
+                  <Button
+                    onClick={() => {
+                      setActiveTab('guidelineMatching');
+                    }}
+                    buttonType="primary"
+                  >
+                    Go to the next step
+                  </Button>
+                </div>
+              ) : null}
+            </TabPanel>
           ) : null}
 
-          {appInstallationParameters.spaceType === 'consumer' ? (
-            <SpaceSelector
-              sdk={sdk}
-              appInstallationParameters={appInstallationParameters}
-              setAppInstallationParameters={setAppInstallationParameters}
-              onVerify={onVerify}
-            />
+          {activeTab === 'guidelineMatching' ? (
+            <TabPanel id="guidelineMatching" className={styles.tabContainer}>
+              <GuidelineMatcher
+                sdk={sdk}
+                appInstallationParameters={appInstallationParameters}
+                setAppInstallationParameters={setAppInstallationParameters}
+                contentTypes={contentTypes}
+                sourceGuidelines={sourceGuidelines}
+              />
+            </TabPanel>
           ) : null}
-
-          {initialSetupDone === true ? (
-            <div className={styles.goToDesignSystemPatternMatching}>
-              <Button
-                onClick={() => {
-                  setActiveTab('designSystemPatternMatching');
-                }}
-                buttonType="primary"
-              >
-                Go to the next step
-              </Button>
-            </div>
-          ) : null}
-        </TabPanel>
-      ) : null}
-
-      {activeTab === 'designSystemPatternMatching' ? (
-        <TabPanel
-          id="designSystemPatternMatching"
-          className={styles.tabContainer}
-        >
-          <DesignSystemPatternMatcher
-            sdk={sdk}
-            appInstallationParameters={appInstallationParameters}
-            setAppInstallationParameters={setAppInstallationParameters}
-            contentTypes={contentTypes}
-            sourceDesignSystemPatterns={sourceDesignSystemPatterns}
-          />
-        </TabPanel>
-      ) : null}
-    </div>
+        </div>
+      </div>
+      <div className={styles.branding}>
+        <img src={logo} className={styles.brandingLogo} alt="Jumpgate logo" />
+      </div>
+    </>
   );
 };
 

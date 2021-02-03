@@ -1,7 +1,13 @@
+.config {
+  background-color: #fafbfb;
+  box-shadow: 0px 3px 6px #00000029;
+  margin-bottom: 30px;
+}
+
 .container {
   height: auto;
   margin: 0 auto;
-  margin: 2rem auto 0;
+  margin: 0 auto;
   max-width: 768px;
   min-height: 65vh;
   padding: var(--spacing-l);
@@ -41,7 +47,38 @@
   grid-template-columns: 1fr 1fr;
 }
 
+.spacePurposeGridItem {
+  align-items: center;
+  display: flex;
+  flex-flow: column;
+}
+
+.spacePurposeGridItemIcon {
+  width: 128px;
+}
+
+.spacePurposeCard {
+  align-items: center;
+  display: flex;
+  min-height: 40px;
+}
+
+.spacePurposeCard:hover,
+.spacePurposeCard:focus {
+  box-shadow: var(--box-shadow-default);
+}
+
+.spacePurposeCardSelected {
+  background-color: var(--color-blue-dark);
+  color: #fff;
+}
+
+.spacePurposeCardSelected p {
+  color: #fff;
+}
+
 .spacePurposeItem {
+  align-items: center;
   display: flex;
 }
 
@@ -61,8 +98,21 @@
   border-color: var(--color-blue-light);
 }
 
-.goToDesignSystemPatternMatching {
+.goToGuidelineMatching {
   display: flex;
   justify-content: flex-end;
   margin-top: var(--spacing-m);
+}
+
+.branding {
+  margin-bottom: 60px;
+  margin-top: 60px;
+}
+
+.brandingLogo {
+  display: block;
+  height: auto;
+  margin-left: auto;
+  margin-right: auto;
+  width: 200px;
 }

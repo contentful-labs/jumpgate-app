@@ -5,7 +5,7 @@ import { useEffect, useMemo, useState } from 'react';
 import {
   getExternalSourceAsset,
   getSourceAsset,
-} from '../../config/getSourceDesignSystemPatterns';
+} from '../../config/getSourceGuidelines';
 import { AppInstallationParameters } from '../../types';
 import getEntryFieldValue from '../../utils/getEntryFieldValue';
 
@@ -72,6 +72,9 @@ const LazyAsset: React.FC<LazyAssetProps> = (props) => {
         )}
         width={file.details.image.width}
         height={file.details.image.height}
+        style={{
+          maxWidth: Math.round(file.details.image.width / 2),
+        }}
       />
       <figcaption>
         {getEntryFieldValue(

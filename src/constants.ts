@@ -1,2 +1,2 @@
-export const SOURCE_CONTENT_TYPE_ID = 'designSystemPattern';
-export const SOURCE_CONTENT_TYPE_NAME = 'Design System Pattern';
+export const SOURCE_CONTENT_TYPE_ID = 'guideline';
+export const SOURCE_CONTENT_TYPE_NAME = 'Guideline';

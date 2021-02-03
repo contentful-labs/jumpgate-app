@@ -6,13 +6,13 @@ import {
 } from 'contentful-ui-extensions-sdk';
 
 import { SOURCE_CONTENT_TYPE_ID } from '../constants';
-import { DesignSystemPatternFields } from '../types';
+import { GuidelineFields } from '../types';
 
-export const getSourceDesignSystemPatterns = async (
+export const getSourceGuidelines = async (
   sdk: AppExtensionSDK,
-): Promise<Entry<DesignSystemPatternFields>[]> => {
+): Promise<Entry<GuidelineFields>[]> => {
   const [getEntriesError, getEntriesResponse] = await catchify(
-    sdk.space.getEntries<Entry<DesignSystemPatternFields>>({
+    sdk.space.getEntries<Entry<GuidelineFields>>({
       limit: 1000,
       content_type: SOURCE_CONTENT_TYPE_ID,
       order: 'fields.name',
@@ -23,17 +23,17 @@ export const getSourceDesignSystemPatterns = async (
     return [];
   }
 
-  const { items: designSystemPatterns } = getEntriesResponse;
+  const { items: guidelines } = getEntriesResponse;
 
-  return designSystemPatterns || [];
+  return guidelines || [];
 };
 
-export const getSourceDesignSystemPattern = async (
+export const getSourceGuideline = async (
   sdk: EditorExtensionSDK,
   entryId: string,
-): Promise<Entry<DesignSystemPatternFields> | null> => {
+): Promise<Entry<GuidelineFields> | null> => {
   const [entryError, entry] = await catchify(
-    sdk.space.getEntry<Entry<DesignSystemPatternFields>>(entryId),
+    sdk.space.getEntry<Entry<GuidelineFields>>(entryId),
   );
 
   if (entryError !== null) {
@@ -58,17 +58,17 @@ export const getSourceAsset = async (
   return asset;
 };
 
-export const getExternalSourceDesignSystemPatterns = async (
+export const getExternalSourceGuidelines = async (
   spaceId: string,
   accessToken: string,
-): Promise<Entry<DesignSystemPatternFields>[]> => {
+): Promise<Entry<GuidelineFields>[]> => {
   const client = createClient({
     space: spaceId,
     accessToken,
   });
 
   const [getEntriesError, getEntriesResponse] = await catchify(
-    client.getEntries<DesignSystemPatternFields>({
+    client.getEntries<GuidelineFields>({
       limit: 1000,
       content_type: SOURCE_CONTENT_TYPE_ID,
       order: 'fields.name',
@@ -79,23 +79,23 @@ export const getExternalSourceDesignSystemPatterns = async (
     return [];
   }
 
-  const { items: designSystemPatterns } = getEntriesResponse;
+  const { items: guidelines } = getEntriesResponse;
 
-  return designSystemPatterns || [];
+  return guidelines || [];
 };
 
-export const getExternalSourceDesignSystemPattern = async (
+export const getExternalSourceGuideline = async (
   spaceId: string,
   accessToken: string,
   entryId: string,
-): Promise<Entry<DesignSystemPatternFields> | null> => {
+): Promise<Entry<GuidelineFields> | null> => {
   const client = createClient({
     space: spaceId,
     accessToken,
   });
 
   const [entryError, entry] = await catchify(
-    client.getEntry<DesignSystemPatternFields>(entryId),
+    client.getEntry<GuidelineFields>(entryId),
   );
 
   if (entryError !== null) {
