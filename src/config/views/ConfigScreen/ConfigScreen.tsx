@@ -122,7 +122,10 @@ const Config: React.FC<ConfigProps> = (props) => {
         );
       }
 
-      if (Object.keys(savedParameters).length > 0) {
+      if (
+        Object.keys(savedParameters).length > 0 &&
+        parameters.spaceType !== 'source'
+      ) {
         setActiveTab('designSystemPatternMatching');
       } else {
         setActiveTab('spaceType');
@@ -599,7 +602,8 @@ const Config: React.FC<ConfigProps> = (props) => {
             />
           ) : null}
 
-          {initialSetupDone === true ? (
+          {initialSetupDone === true &&
+          appInstallationParameters.spaceType !== 'source' ? (
             <div className={styles.goToDesignSystemPatternMatching}>
               <Button
                 onClick={() => {
