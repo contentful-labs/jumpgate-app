@@ -6,7 +6,6 @@ import {
   SkeletonContainer,
   SkeletonBodyText,
   EmptyState,
-  Paragraph,
   Icon,
 } from '@contentful/forma-36-react-components';
 import {
