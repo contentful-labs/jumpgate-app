@@ -19,6 +19,8 @@ import {
   Icon,
   IconButton,
   Button,
+  Heading,
+  Tooltip,
 } from '@contentful/forma-36-react-components';
 
 import {
@@ -440,21 +442,11 @@ const Config: React.FC<ConfigProps> = (props) => {
         <div className={styles.container}>
           <div className={styles.headerMenu}>
             <Tabs>
-              {activeTab === 'spaceType' ? (
-                <Tab id="spaceType" selected className={styles.tabWithIcon}>
-                  Installation{' '}
-                  {initialSetupDone ? (
-                    <Icon color="positive" icon="CheckCircle" />
-                  ) : null}{' '}
-                </Tab>
-              ) : null}
-
-              {(appInstallationParameters.spaceType === 'consumer' ||
-                appInstallationParameters.spaceType === 'sourceandconsumer') &&
-              activeTab === 'guidelineMatching' ? (
+              {appInstallationParameters.spaceType === 'consumer' ||
+              appInstallationParameters.spaceType === 'sourceandconsumer' ? (
                 <Tab
                   id="spaceType"
-                  selected
+                  selected={activeTab === 'guidelineMatching'}
                   disabled={
                     (appInstallationParameters.spaceType ===
                       'sourceandconsumer' &&
@@ -463,10 +455,37 @@ const Config: React.FC<ConfigProps> = (props) => {
                       appInstallationParameters.sourceConnectionValidated ===
                         false)
                   }
+                  onSelect={() => {
+                    setActiveTab('guidelineMatching');
+                  }}
                 >
-                  Guidelines matching
+                  {initialSetupDone === true ? (
+                    <>Guideline set up</>
+                  ) : (
+                    <Tooltip
+                      content="Verify connection to the source space to proceed"
+                      usePortal
+                      place="bottom"
+                    >
+                      Guideline set up
+                    </Tooltip>
+                  )}
                 </Tab>
               ) : null}
+
+              <Tab
+                id="spaceType"
+                selected={activeTab === 'spaceType'}
+                className={styles.tabWithIcon}
+                onSelect={() => {
+                  setActiveTab('spaceType');
+                }}
+              >
+                App installation{' '}
+                {initialSetupDone ? (
+                  <Icon color="positive" icon="CheckCircle" />
+                ) : null}{' '}
+              </Tab>
             </Tabs>
             {activeTab !== 'spaceType' ? (
               <IconButton
@@ -492,12 +511,13 @@ const Config: React.FC<ConfigProps> = (props) => {
                     users a way to author the content displayed in other spaces.
                   </Paragraph>
                   <Subheading className={styles.spacePurposeTitle}>
-                    What is the purpose of the app for this space?
+                    Select the purpose of this space:
                   </Subheading>
                 </Typography>
 
                 <div className={styles.spacePurposeGrid}>
                   <div className={styles.spacePurposeGridItem}>
+                    <Heading element="h2">Source space</Heading>
                     <img
                       src={iconSourceSpace}
                       alt="Source space icon"
@@ -534,12 +554,13 @@ const Config: React.FC<ConfigProps> = (props) => {
                           ) : null}
                         </div>
                         <Paragraph>
-                          I will be defining guidelines in this space
+                          Use this space to create guidelines
                         </Paragraph>
                       </div>
                     </Card>
                   </div>
                   <div className={styles.spacePurposeGridItem}>
+                    <Heading element="h2">Target space</Heading>
                     <img
                       src={iconConsumerSpace}
                       alt="Consumer space icon"
@@ -576,7 +597,7 @@ const Config: React.FC<ConfigProps> = (props) => {
                           ) : null}
                         </div>
                         <Paragraph>
-                          I will be documenting content types of this&nbsp;space
+                          Use this space to display guidelines
                         </Paragraph>
                       </div>
                     </Card>
@@ -592,21 +613,16 @@ const Config: React.FC<ConfigProps> = (props) => {
                     </SkeletonContainer>
                   ) : (
                     <div>
-                      <Typography>
-                        <Subheading>Guideline - content type</Subheading>
-                        <Paragraph>
-                          The app will generate a content type in this space
-                          that will serve as your guidelines source.
-                        </Paragraph>
-                      </Typography>
                       {contentTypeExists === true ? (
                         <Note noteType="positive">
-                          Guideline content type is present in this space.
+                          {appInstallationParameters.spaceType === 'source'
+                            ? 'This space is configured to create guidelines.'
+                            : 'This space is configured to create and display guidelines.'}
                         </Note>
                       ) : (
                         <Note>
-                          Installing this app will automatically create a new
-                          content type in this space.
+                          Installing the app will create a new content type in
+                          this space.
                         </Note>
                       )}
                     </div>
@@ -615,25 +631,52 @@ const Config: React.FC<ConfigProps> = (props) => {
               ) : null}
 
               {appInstallationParameters.spaceType === 'consumer' ? (
-                <SpaceSelector
-                  sdk={sdk}
-                  appInstallationParameters={appInstallationParameters}
-                  setAppInstallationParameters={setAppInstallationParameters}
-                  onVerify={onVerify}
-                />
+                <>
+                  <SpaceSelector
+                    sdk={sdk}
+                    appInstallationParameters={appInstallationParameters}
+                    setAppInstallationParameters={setAppInstallationParameters}
+                    onVerify={onVerify}
+                  />
+
+                  {appInstallationParameters.sourceConnectionValidated ? (
+                    <Note noteType="positive">
+                      This space is configured to display guidelines from the
+                      connected space.
+                    </Note>
+                  ) : (
+                    <Note>
+                      Installing the app will display the guidelines available
+                      in the source space.
+                    </Note>
+                  )}
+                </>
               ) : null}
 
-              {initialSetupDone === true &&
-              appInstallationParameters.spaceType !== 'source' ? (
+              {appInstallationParameters.spaceType !== 'source' ? (
                 <div className={styles.goToGuidelineMatching}>
-                  <Button
-                    onClick={() => {
-                      setActiveTab('guidelineMatching');
-                    }}
-                    buttonType="primary"
-                  >
-                    Go to the next step
-                  </Button>
+                  {initialSetupDone === true ? (
+                    <Button
+                      onClick={() => {
+                        setActiveTab('guidelineMatching');
+                      }}
+                      buttonType="primary"
+                    >
+                      Set up guidelines
+                    </Button>
+                  ) : (
+                    <Tooltip content="Verify connection to the source space to proceed">
+                      <Button
+                        onClick={() => {
+                          setActiveTab('guidelineMatching');
+                        }}
+                        buttonType="muted"
+                        disabled
+                      >
+                        Set up guidelines
+                      </Button>
+                    </Tooltip>
+                  )}
                 </div>
               ) : null}
             </TabPanel>

@@ -9,6 +9,8 @@ import {
   Typography,
   Button,
   Tag,
+  Icon,
+  Tooltip,
 } from '@contentful/forma-36-react-components';
 
 import { AppInstallationParameters } from '../../../../types';
@@ -34,14 +36,18 @@ const SpaceSelector: React.FC<SpaceSelectorProps> = (props) => {
     <Form className={styles.container}>
       <Typography>
         <Subheading className={styles.heading}>
-          Connect a source space
+          Connect a source space{' '}
+          <Tooltip
+            content="You can find your Space ID and Delivery API token in Space settings, under the API keys menu item."
+            containerElement="div"
+          >
+            <Icon
+              icon="InfoCircle"
+              color="muted"
+              className={styles.headingIcon}
+            />
+          </Tooltip>
         </Subheading>
-        <Paragraph>
-          To set up the Jumpgate app, please provide the Space ID and Content
-          Delivery API (CDA) token from your space below. Once the connection
-          with the source space is set up, you will be able to map the content
-          guidelines you created to content types in this space.
-        </Paragraph>
       </Typography>
       <TextField
         labelText="Space ID"
@@ -82,7 +88,9 @@ const SpaceSelector: React.FC<SpaceSelectorProps> = (props) => {
       {appInstallationParameters.sourceConnectionValidated ? (
         <Tag tagType="positive">Connection verified</Tag>
       ) : (
-        <Button onClick={onVerify}>Verify connection</Button>
+        <Button onClick={onVerify} size="small">
+          Verify connection
+        </Button>
       )}
     </Form>
   );

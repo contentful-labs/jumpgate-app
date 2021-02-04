@@ -160,10 +160,10 @@ const GuidelineMatcher: React.FC<GuidelineMatcherProps> = (props) => {
   ) : (
     <Typography>
       <Paragraph>
-        The form below allows you to assign the guidelines / resources / info
-        text from the source space to a specific content type within this space.
-        Once assigned, the guidelines will be displayed for all the entries of
-        the chosen type, under the Jumpgate tab in the entry editor view.
+        The form below allows you to assign the guidelines from the source space
+        to a specific content type within this space. Once assigned, the
+        guidelines will be displayed for all the entries of the chosen type,
+        under the Jumpgate tab in the entry editor view.
       </Paragraph>
       <Form>
         <Table>

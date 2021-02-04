@@ -4,6 +4,11 @@
 }
 
 .heading {
+  align-items: center;
   display: flex;
-  justify-content: space-between;
+}
+
+.headingIcon {
+  display: block;
+  margin-left: var(--spacing-xs);
 }
