@@ -58,33 +58,33 @@
     }
   },
   "dependencies": {
-    "@contentful/field-editor-single-line": "^0.13.0",
-    "@contentful/field-editor-test-utils": "^0.9.0",
+    "@contentful/field-editor-single-line": "^0.13.1",
+    "@contentful/field-editor-test-utils": "^0.10.0",
     "@contentful/forma-36-fcss": "^0.3.0",
-    "@contentful/forma-36-react-components": "^3.75.0",
+    "@contentful/forma-36-react-components": "^3.78.3",
     "@contentful/forma-36-tokens": "^0.10.0",
     "@contentful/rich-text-react-renderer": "^14.1.2",
-    "ahooks": "^2.9.4",
+    "ahooks": "^2.9.6",
     "catchify": "^2.6.1",
     "contentful": "^8.1.7",
-    "contentful-ui-extensions-sdk": "^3.31.0",
+    "contentful-ui-extensions-sdk": "^3.32.0",
     "react": "^17.0.1",
     "react-dom": "^17.0.1"
   },
   "devDependencies": {
     "@contentful/rich-text-types": "^14.1.2",
     "@testing-library/jest-dom": "^5.11.9",
-    "@testing-library/react": "^11.2.3",
-    "@testing-library/user-event": "^12.6.2",
+    "@testing-library/react": "^11.2.5",
+    "@testing-library/user-event": "^12.6.3",
     "@types/jest": "^26.0.20",
-    "@types/node": "^14.14.22",
-    "@types/react": "^17.0.0",
+    "@types/node": "^14.14.25",
+    "@types/react": "^17.0.1",
     "@types/react-dom": "^17.0.0",
     "eslint-plugin-import-helpers": "^1.1.0",
     "husky": "^4.3.8",
     "lint-staged": "^10.5.3",
     "prettier": "^2.2.1",
-    "react-scripts": "^4.0.1",
+    "react-scripts": "^4.0.2",
     "typescript": "^4.1.3"
   }
 }
