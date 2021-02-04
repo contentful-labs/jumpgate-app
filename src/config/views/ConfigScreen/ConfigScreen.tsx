@@ -487,15 +487,6 @@ const Config: React.FC<ConfigProps> = (props) => {
                 ) : null}{' '}
               </Tab>
             </Tabs>
-            {activeTab !== 'spaceType' ? (
-              <IconButton
-                label="Settings"
-                iconProps={{ icon: 'Settings', color: 'positive' }}
-                onClick={() => {
-                  setActiveTab('spaceType');
-                }}
-              />
-            ) : null}
           </div>
 
           {activeTab === 'spaceType' ? (
