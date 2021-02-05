@@ -157,6 +157,14 @@ const GuidelineMatcher: React.FC<GuidelineMatcherProps> = (props) => {
           'Once you publish some guidelines in the source space, they will show up here allowing you to assign them to the content types in the target space.',
       }}
     />
+  ) : filteredContentTypes.length === 0 ? (
+    <EmptyState
+      headingProps={{ text: 'Nothing to see here (yet!)' }}
+      descriptionProps={{
+        text:
+          'Once you publish some content types in the target space, they will show up here. Assign guidelines to content types in the target space and they will be displayed in all entries of that content type.',
+      }}
+    />
   ) : (
     <Typography>
       <Paragraph>
