@@ -462,7 +462,11 @@ const Config: React.FC<ConfigProps> = (props) => {
                     <>Guideline set up</>
                   ) : (
                     <Tooltip
-                      content="Verify connection to the source space to proceed"
+                      content={
+                        appInstallationParameters.spaceType === 'consumer'
+                          ? 'Verify connection to the source space to proceed'
+                          : 'Install the app to proceed'
+                      }
                       usePortal
                       place="bottom"
                     >
@@ -643,7 +647,8 @@ const Config: React.FC<ConfigProps> = (props) => {
                 </>
               ) : null}
 
-              {appInstallationParameters.spaceType !== 'source' ? (
+              {appInstallationParameters.spaceType !== 'source' &&
+              appInstallationParameters.spaceType !== null ? (
                 <div className={styles.goToGuidelineMatching}>
                   {initialSetupDone === true ? (
                     <Button
@@ -655,7 +660,13 @@ const Config: React.FC<ConfigProps> = (props) => {
                       Set up guidelines
                     </Button>
                   ) : (
-                    <Tooltip content="Verify connection to the source space to proceed">
+                    <Tooltip
+                      content={
+                        appInstallationParameters.spaceType === 'consumer'
+                          ? 'Verify connection to the source space to proceed'
+                          : 'Install the app to proceed'
+                      }
+                    >
                       <Button
                         onClick={() => {
                           setActiveTab('guidelineMatching');
