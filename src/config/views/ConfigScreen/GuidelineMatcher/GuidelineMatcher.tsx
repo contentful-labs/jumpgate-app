@@ -170,7 +170,10 @@ const GuidelineMatcher: React.FC<GuidelineMatcherProps> = (props) => {
           <TableHead isSticky>
             <TableRow>
               <TableCell>
-                <Tooltip content="Content types of this space" usePortal>
+                <Tooltip
+                  content="List of available content types in the target space."
+                  usePortal
+                >
                   <div className={styles.tableHeadCell}>
                     Content Type{' '}
                     <Icon
@@ -183,11 +186,11 @@ const GuidelineMatcher: React.FC<GuidelineMatcherProps> = (props) => {
               </TableCell>
               <TableCell>
                 <Tooltip
-                  content="Guidelines defined in the source space"
+                  content="List of guidelines from the source space."
                   usePortal
                 >
                   <div className={styles.tableHeadCell}>
-                    Guideline{' '}
+                    Guidelines{' '}
                     <Icon
                       icon="HelpCircle"
                       className={styles.tableHeadCellIcon}
