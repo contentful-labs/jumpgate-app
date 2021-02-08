@@ -1,29 +1,38 @@
 Jumpgate app
 
-This project was bootstrapped with [Create Contentful App](https://github.com/contentful/create-contentful-app).
+# Installing the app in your Contentful space
 
-## Available Scripts
+## Scripted installation
 
-In the project directory, you can run:
+The app comes with a script to install the app in your space. The script does the following:
 
-#### `npm start`
+- Create a new app definition in your organization
+- Creates a new app installation in your space
 
-Creates or update your app definition in contentful, and runs the app in development mode.
-Open your app to view it in the browser.
+To run the script, you need to have the following:
 
-The page will reload if you make edits.
-You will also see any lint errors in the console.
+- A Contentful space ID
+- Contentful management token (you can generate one [here](https://app.contentful.com/account/profile/cma_tokens))
 
-#### `npm run build`
+Note: In order for script to work, you need to have permissiosn to create app definitions in the organization your space belongs to
 
-Builds the app for production to the `build` folder.
-It correctly bundles React in production mode and optimizes the build for the best performance.
+### Running the script
 
-The build is minified and the filenames include the hashes.
-Your app is ready to be deployed!
+After cloning this repo, run `npm install` and wait for the dependencies to install. Then, run the following command:
 
-## Learn More
+```
+npm run installToSpace -- --spaceId="<SPACE_ID>" --cmaToken="<MANAGEMENT_TOKEN>"
+```
 
-[Read more](https://www.contentful.com/developers/docs/extensibility/app-framework/create-contentful-app/) and check out the video on how to use the CLI.
+Replace the `<SPACE_ID>` and `<MANAGEMENT_TOKEN>` placeholders with actual space ID and management token.
 
-Create Contentful App uses [Create React App](https://create-react-app.dev/). You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started) and how to further customize your app.
+The script should take ~2 seconds to finish. After finishing, you can go to your Contentful space and you should see the app installed there. Proceed with configuring the app.
+
+## Manual installation
+
+The app can also be added to your organization/space manually. In Contentful, go to Organization settings -> Apps and click on Create app.
+
+Fill the Name field as you wish (tip: whatever you put here will show up as a title of an entry editor tab on content types that have guidelines assigned).
+Set App URL to `https://jumpgate.vercel.app` and check "App configuration screen" and "Entry editor" boxes in the Location field, and then click Create.
+
+Go to the Contentful space where you wish to install the app, and then go to Apps -> Manage apps. You should see your app available for installation under the "Available" list. Click on it and proceed with configuring the app.
