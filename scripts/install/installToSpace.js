@@ -1,7 +1,7 @@
 const catchify = require('catchify');
 const { createClient } = require('contentful-management');
 
-const APP_URL = 'https://jumpgate.vercel.app';
+const APP_URL = process.env.APP_URL || 'https://jumpgate.vercel.app';
 
 const installAppToSpace = async ({ cmaToken, spaceId }) => {
   const client = createClient({

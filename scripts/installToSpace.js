@@ -1,8 +1,8 @@
+require('dotenv').config();
+
 const yargs = require('yargs');
 
 const installToSpace = require('./install/installToSpace');
-
-require('dotenv').config();
 
 const { argv } = yargs
   .options({
