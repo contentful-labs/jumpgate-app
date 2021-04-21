@@ -315,12 +315,9 @@ const Config: React.FC<ConfigProps> = (props) => {
                   ] === ''
                     ? {}
                     : {
-                        editors: [
-                          {
-                            widgetNamespace: 'app',
-                            widgetId: 'pattern-reference',
-                          },
-                        ],
+                        editors: {
+                          position: 1,
+                        },
                       },
               };
             },
