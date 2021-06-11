@@ -165,7 +165,7 @@ const EntryEditor: React.FC<ConfigProps> = (props) => {
     );
   }, [guideline, sdk.locales.default]);
   const storybookUrl = useMemo<string>(() => {
-    if (iframePreviewUrl.includes('&viewMode=story') == false) {
+    if (iframePreviewUrl.includes('&viewMode=story') === false) {
       return '';
     }
 
