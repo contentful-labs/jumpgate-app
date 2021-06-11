@@ -164,8 +164,20 @@ const EntryEditor: React.FC<ConfigProps> = (props) => {
       ) || ''
     );
   }, [guideline, sdk.locales.default]);
-  const isStorybookIframe = useMemo(() => {
-    return iframePreviewUrl.includes('&viewMode=story');
+  const storybookUrl = useMemo<string>(() => {
+    if (iframePreviewUrl.includes('&viewMode=story') == false) {
+      return '';
+    }
+
+    const baseUrl = iframePreviewUrl.split('?')[0].replace('iframe.html', '');
+    const url = new URL(iframePreviewUrl);
+    const id = url.searchParams.get('id');
+
+    if (id === null) {
+      return baseUrl;
+    }
+
+    return `${baseUrl}/?path=/story/${id}`;
   }, [iframePreviewUrl]);
 
   useEffect(() => {
@@ -231,35 +243,31 @@ const EntryEditor: React.FC<ConfigProps> = (props) => {
                     Example preview:
                   </h2>
                   <div>
-                    <button
+                    <a
                       className={styles.previewButton}
-                      onClick={() => {
-                        window.open(iframePreviewUrl);
-                      }}
+                      href={iframePreviewUrl}
+                      target="_blank"
+                      rel="noreferrer noopener"
                     >
                       <Icon
                         icon="ExternalLink"
                         className={styles.previewButtonIcon}
                       />
                       Open in a new window
-                    </button>
-                    {isStorybookIframe ? (
-                      <button
+                    </a>
+                    {storybookUrl !== '' ? (
+                      <a
                         className={styles.previewButton}
-                        onClick={() => {
-                          window.open(
-                            iframePreviewUrl
-                              .split('?')[0]
-                              .replace('iframe.html', ''),
-                          );
-                        }}
+                        href={storybookUrl}
+                        target="_blank"
+                        rel="noreferrer noopener"
                       >
                         <Icon
                           icon="ExternalLink"
                           className={styles.previewButtonIcon}
                         />
                         Open full documentation
-                      </button>
+                      </a>
                     ) : null}
                   </div>
                 </div>
